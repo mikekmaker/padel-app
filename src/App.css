@@ -36,3 +36,24 @@
     transform: rotate(360deg);
   }
 }
+
+.error {
+  color:  #ff6660; /*#ff3333;*/
+  font-size: 0.9em;
+}
+
+.error:focus {
+  border-color: #ff6660; 
+  box-shadow: 0 0 12px rgba(33, 3, 2, 0.3); 
+}
+
+.floating-error {
+  color: #007faf;/*#bb417a;/*#ff4d4d;  A bright red color that stands out against gray */
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black for contrast */
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+

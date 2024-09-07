@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Padel App",
+  "name": "Padel Club Court Reservation System",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,13 +8,13 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
-      "type": "image/png",
+      "src": "/images/padel-ball.jpg",
+      "type": "image/jpg",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
-      "type": "image/png",
+      "src": "/images/padel_court.jpg",
+      "type": "image/jpg",
       "sizes": "512x512"
     }
   ],
