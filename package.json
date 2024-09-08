@@ -20,7 +20,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "npm run build && npx serve -s build"
+    "deploy": "npm install serve --save-dev && npm run build && npm serve -s build"
   },
   "eslintConfig": {
     "extends": [
