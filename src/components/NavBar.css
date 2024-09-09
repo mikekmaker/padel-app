@@ -46,7 +46,7 @@
 }
 
 .nav-item {
-  height: 80px;
+  height: 40px;
 }
 
 .nav-links {
@@ -108,6 +108,7 @@
     padding: 2rem;
     width: 100%;
     display: table;
+    margin-left: -2rem;
   }
 
   .nav-links:hover {
