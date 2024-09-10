@@ -1,0 +1,28 @@
+.radio-group {
+    display: flex!important;
+    flex-wrap: nowrap!important; /* Allow wrapping on smaller screens */
+    gap: 10px!important; /* Space between buttons */
+  }
+  
+  .radio-item {
+    display: flex!important;
+    align-items: center!important; /* Align the radio button and label vertically */
+  }
+  
+  .radio-item label {
+    margin-left: 5px!important; /* Space between the radio button and label */
+  }
+
+  .form-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  input[type="radio"] {
+    margin-right: 8px;
+  }
+  
+  label {
+    margin-right: 15px;
+  }
+  

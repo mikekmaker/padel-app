@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Config } from '../../config';
-
 import '../../App.css';
+import './SignUp.css';
 import { FancyInput } from '../../components/FancyInput';
 import axios from 'axios';
+import {handleServerError,handleNetworkError} from '../../components/HandlerError';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -27,7 +28,21 @@ export default function SignUp() {
 
   const [photoBase64, setPhotoBase64] = useState('');
   const [imageSrc, setImageSrc] = useState('');
-  const [imageType, setImageType] = useState('png');
+  const [edad, setEdad] = useState('');
+  const imageType = 'png';
+
+  //inicializo opciones de controles
+  const optionsNivel = [
+    { value: 'principiante', label: 'Principiante' },
+    { value: 'intermedio', label: 'Intermedio' },
+    { value: 'avanzado', label: 'Avanzado' }
+  ];
+  
+  const optionsTipoJuego = [
+    { value: 'reves', label: 'Reves' },
+    { value: 'drive', label: 'Drive' },
+    { value: 'indistinto', label: 'Indistinto' }
+  ];
 
   //inicialización de lista para validación de datos de formulario
   const [errors, setErrors] = useState({});
@@ -77,12 +92,11 @@ export default function SignUp() {
         }
 
         try {
-            // Send data to the server
-            // console.log("data a enviar:");
-            // for (let pair of data.entries()) {
-            //   console.log(`${pair[0]}: ${pair[1]}`);
-            // }
-
+            //Send data to the server
+            console.log("data a enviar:");
+            for (let pair of data.entries()) {
+              console.log(`${pair[0]}: ${pair[1]}`);
+            }
             const response = await axios.post(`${Config.apiPrefix}/usuario`, data, {
                 headers: {
                   'Content-Type': 'application/json',
@@ -93,27 +107,11 @@ export default function SignUp() {
             console.log('Response:', response.data);
             console.log('Form data submitted:', formData);
         } catch (error) {
-          console.log("fallo codigo:");
-          console.log(error.response.status);
-          if (error.response) {
-            if (error.response.status === 422) {
-              // Specific handling for 422 Unprocessable Entity
-              console.error('Validation error:', error.response.data);
-            } else {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
-              console.error('Error data:', error.response.data);
-              console.error('Error status:', error.response.status);
-              console.error('Error headers:', error.response.headers);
-            }
-          } else if (error.request) {
-              // The request was made but no response was received
-              console.error('Error request:', error.request);
+          if (!error.response) {
+            console.log(handleNetworkError(error));
           } else {
-              // Something happened in setting up the request that triggered an Error
-              console.error('Error message:', error.message);
+            console.log(handleServerError(error));
           }
-          console.error('Error config:', error.config);
         }
       }
   };
@@ -144,6 +142,23 @@ export default function SignUp() {
       setImageSrc(photoBase64);
     }
   }, [photoBase64, imageType]);
+
+  const limitInput = (e) => {
+    let inputValue = e.target.value;
+
+    // Ensure the value is not longer than 2 characters
+    if (inputValue.length > 2) {
+      inputValue = inputValue.slice(0, 2);
+    }
+
+    // Ensure the value doesn't exceed 99
+    if (inputValue > 99) {
+      inputValue = 99;
+    }
+
+    setEdad(inputValue);
+  };
+
 
   return ( 
     <>
@@ -192,15 +207,27 @@ export default function SignUp() {
               </div>
               <div>
                   <h3 className="text-4xl font-medium">G&eacute;nero</h3>
-                  <FancyInput label="" placeholder="Ingrese su g&eacute;nero" type="text" value={formData.genero}
-                    name="genero"
-                    className={`fancy-input ${errors.genero ? 'fancy-input-error' : ''}`}
-                    onChange={handleChange} />
-                    {errors.genero && <p className="error">{errors.genero}</p>}
+                  <div  className="radio-group">
+                      <div className="radio-item">
+                      <FancyInput label="" placeholder="Ingrese su g&eacute;nero" type="radio" id="masculino" value="Masculino"
+                        name="genero"
+                        checked={formData.genero === 'Masculino'}
+                        className={`fancy-input ${errors.genero ? 'fancy-input-error' : ''}`}
+                        onChange={handleChange} /><label htmlFor='masculino'>Masculino</label>
+                      </div>
+                      <div  className="radio-item">
+                      <FancyInput label="" placeholder="Ingrese su g&eacute;nero" type="radio" id="femenino" value="Femenino"
+                        name="genero"
+                        checked={formData.genero === 'Femenino'}
+                        className={`fancy-input ${errors.genero ? 'fancy-input-error' : ''}`}
+                        onChange={handleChange} /><label htmlFor='masculino' className='ml-2'>Femenino</label>
+                      </div>
+                  </div>
+                  {errors.genero && <p className="error">{errors.genero}</p>}
               </div>
               <div>
                   <h3 className="text-4xl font-medium">Edad</h3>
-                  <FancyInput label="" placeholder="ingrese su edad" type="text" value={formData.edad}
+                  <FancyInput label="" placeholder="ingrese su edad" type="number" min="0" max="99" maxLength="2" onInput={limitInput} value={edad} 
                     name="edad"
                     className={`fancy-input ${errors.edad ? 'fancy-input-error' : ''}`}
                     onChange={handleChange} />
@@ -240,18 +267,32 @@ export default function SignUp() {
               </div>
               <div>
                   <h3 className="text-4xl font-medium">Nivel de juego</h3>
-                  <FancyInput label="" placeholder="ej: principante, intermedio, avanzado" type="text" value={formData.nivel}
+                  <select label="" placeholder="ej: principante, intermedio, avanzado" type="text" value={formData.nivel}
                     name="nivel"
                     className={`fancy-input ${errors.nivel ? 'fancy-input-error' : ''}`}
-                    onChange={handleChange} />
-                    {errors.nivel && <p className="error">{errors.nivel}</p>}
+                    onChange={handleChange}>
+                    <option value="" disabled>Select nivel</option>
+                    {optionsNivel.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.nivel && <p className="error">{errors.nivel}</p>}
               </div>
               <div>
                   <h3 className="text-4xl font-medium">Tipo de juego</h3>
-                  <FancyInput label="" placeholder="ingrese su tipo de juego" type="text" value={formData.tipoJuego}
+                  <select label="" placeholder="reves, drive, indistinto" type="text" value={formData.tipoJuego}
                     name="tipoJuego"
                     className={`fancy-input ${errors.tipoJuego ? 'fancy-input-error' : ''}`}
-                    onChange={handleChange} />
+                    onChange={handleChange}>
+                     <option value="" disabled>Select tipo de juego</option>
+                      {optionsTipoJuego.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                  </select>
                     {errors.tipoJuego && <p className="error">{errors.tipoJuego}</p>}
               </div>
               <div>
