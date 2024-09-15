@@ -3,8 +3,10 @@ import { Config } from '../../config';
 import '../../App.css';
 import './SignUp.css';
 import { FancyInput } from '../../components/FancyInput';
-import axios from 'axios';
 import {handleServerError,handleNetworkError} from '../../components/HandlerError';
+import { UseFetch } from '../../UseFetch';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -26,6 +28,13 @@ export default function SignUp() {
     idTipoUsuario: 3
   });
 
+  //envio de datos
+  const [model,setModel] = useState(null);
+  const [action,setAction] = useState('NONE');
+  let url = `${Config.apiPrefix}/usuario`;
+  const {dataResponse, loading, error} = UseFetch(url, action, model);
+
+  //manejo de imagenes
   const [photoBase64, setPhotoBase64] = useState('');
   const [imageSrc, setImageSrc] = useState('');
   const [edad, setEdad] = useState('');
@@ -44,6 +53,11 @@ export default function SignUp() {
     { value: 'indistinto', label: 'Indistinto' }
   ];
 
+  const eventOk = "Usuario registrado correctamente!";
+  const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
+  const mandatoryFieldMsg = "Este campo es obligatorio";
+  const eventError = "Se produjo un error inesperado!";
+
   //inicialización de lista para validación de datos de formulario
   const [errors, setErrors] = useState({});
   const [formErrorMessage, setFormErrorMessage] = useState('');
@@ -52,7 +66,7 @@ export default function SignUp() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: '' });
-};
+  };
 
   //envio de formulario
   const handleSubmit = async (e) => {
@@ -62,12 +76,12 @@ export default function SignUp() {
     const newErrors = {};
     Object.keys(formData).forEach((key) => {
         if (!formData[key]) {
-            newErrors[key] = 'Este campo es obligatorio';
+            newErrors[key] = mandatoryFieldMsg;
         }
     });
 
     if (Object.keys(newErrors).length > 0) {
-        setFormErrorMessage('Por favor, complete todos los campos obligatorios.');
+        setFormErrorMessage(incompleteFieldsError);
         setErrors(newErrors);
       } else {
         setFormErrorMessage('');
@@ -97,14 +111,8 @@ export default function SignUp() {
             for (let pair of data.entries()) {
               console.log(`${pair[0]}: ${pair[1]}`);
             }
-            const response = await axios.post(`${Config.apiPrefix}/usuario`, data, {
-                headers: {
-                  'Content-Type': 'application/json',
-                  'accept':'application/json'
-                }
-              }
-            );
-            console.log('Response:', response.data);
+            setAction('POST');
+            setModel(data);
             console.log('Form data submitted:', formData);
         } catch (error) {
           if (!error.response) {
@@ -143,6 +151,27 @@ export default function SignUp() {
     }
   }, [photoBase64, imageType]);
 
+  useEffect(() => {
+    console.log('Response Data:', dataResponse);
+    console.log("CARGANDO?");
+    console.log('Loading:', loading);
+    console.log("QUE ERROR DEVUELVE USEFETCH?");
+    console.log('Error:', error);
+
+    if (loading) {
+      toast.info('Loading...', {autoClose: 500,});
+    }
+    else
+    {
+      if (error) {
+        toast.error(`${eventError}: ${error}`, {autoClose: 2000,});
+      }
+      if (dataResponse) {
+        toast.success(`${eventOk}`, {autoClose: 1500,});
+      }
+    }
+  }, [dataResponse,loading, error]);
+
   const limitInput = (e) => {
     let inputValue = e.target.value;
 
@@ -155,7 +184,6 @@ export default function SignUp() {
     if (inputValue > 99) {
       inputValue = 99;
     }
-
     setEdad(inputValue);
   };
 
@@ -313,10 +341,11 @@ export default function SignUp() {
               {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
               <button type="submit"  className="btns btn--outline btn--large">Enviar</button>
       </form>
-      <div>
+      <div style={{width:100, height:100}}>
               {imageSrc && <img src={imageSrc} alt="Preview" />}
               </div>
-    </div>       
+      </div>  
+      <ToastContainer />
     </>
   );
 }
