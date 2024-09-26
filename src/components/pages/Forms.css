@@ -26,3 +26,28 @@
     margin-right: 15px;
   }
   
+  @media (min-width: 800px) {
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+      gap: 20px; /* Adjust spacing between controls */
+    }
+  }
+  
+  @media (max-width: 800px) {
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr; /* 1 column for smaller screens */
+      gap: 20px;
+    }
+  }
+  
+  /* .fancy-input {
+    width: 100%;
+  } */
+  
+  /* .hero-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  } */
+  
