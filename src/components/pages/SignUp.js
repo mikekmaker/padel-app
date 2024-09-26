@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Config } from '../../config';
 import '../../App.css';
-import './SignUp.css';
+import './Forms.css';
 import { FancyInput } from '../../components/FancyInput';
-import {handleServerError,handleNetworkError} from '../../components/HandlerError';
+import { handleServerError, handleNetworkError } from '../../components/HandlerError';
 import { UseFetch } from '../../UseFetch';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function SignUp() {
+
+  //formulario para el modelo
   const [formData, setFormData] = useState({
-    usuarioId: '0',
+    id: '0',
     alias: '',
     contrasena: '',
     recontrasena:'',
@@ -23,7 +25,7 @@ export default function SignUp() {
     remail:'',
     telefono: '',
     nivel: '',
-    tipoJuego:'',
+    tipoDeJuego:'',
     fotoperfil: '',
     idTipoUsuario: 3
   });
@@ -31,7 +33,8 @@ export default function SignUp() {
   //envio de datos
   const [model,setModel] = useState(null);
   const [action,setAction] = useState('NONE');
-  let url = `${Config.apiPrefix}/usuario`;
+  let url = `${Config.boApiPrefix}/usuarios`;
+  console.log(url);
   const {dataResponse, loading, error} = UseFetch(url, action, model);
 
   //manejo de imagenes
@@ -40,19 +43,21 @@ export default function SignUp() {
   const [edad, setEdad] = useState('');
   const imageType = 'png';
 
-  //inicializo opciones de controles
+  //inicializar opciones de controles
   const optionsNivel = [
     { value: 'principiante', label: 'Principiante' },
     { value: 'intermedio', label: 'Intermedio' },
     { value: 'avanzado', label: 'Avanzado' }
   ];
   
-  const optionsTipoJuego = [
+  const optionsTipoDeJuego = [
     { value: 'reves', label: 'Reves' },
     { value: 'drive', label: 'Drive' },
     { value: 'indistinto', label: 'Indistinto' }
   ];
+  //fin inicializar controles
 
+  //mensajes
   const eventOk = "Usuario registrado correctamente!";
   const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
   const mandatoryFieldMsg = "Este campo es obligatorio";
@@ -61,6 +66,7 @@ export default function SignUp() {
   //inicialización de lista para validación de datos de formulario
   const [errors, setErrors] = useState({});
   const [formErrorMessage, setFormErrorMessage] = useState('');
+
   //manejo de cambios en formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,11 +78,12 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate the form
+    // Validaciones de formulario
     const newErrors = {};
     Object.keys(formData).forEach((key) => {
         if (!formData[key]) {
             newErrors[key] = mandatoryFieldMsg;
+            console.log(key);
         }
     });
 
@@ -85,9 +92,9 @@ export default function SignUp() {
         setErrors(newErrors);
       } else {
         setFormErrorMessage('');
-        // Create FormData object
+        // Creacion de objeto FormData para enviar instancia del modelo
         const data = new FormData();
-        data.append('usuarioId', formData.usuarioId);
+        data.append('id', formData.id);
         data.append('alias', formData.alias);
         data.append('contrasena', formData.contrasena);
         data.append('nombre', formData.nombre);
@@ -97,8 +104,8 @@ export default function SignUp() {
         data.append('direccion', formData.direccion);
         data.append('email', formData.email);
         data.append('telefono', formData.telefono);
-        data.append('nivel', formData.nivel);
-        data.append('tipoJuego',formData.tipoJuego);
+        data.append('nivel', formData.nivel); 
+        data.append('tipoDeJuego',formData.tipoDeJuego);
         data.append('idTipoUsuario',formData.idTipoUsuario)
 
         if (formData.fotoperfil) {
@@ -124,6 +131,7 @@ export default function SignUp() {
       }
   };
 
+  //manejador de cambios de foto
   const handlePhotoChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -145,12 +153,14 @@ export default function SignUp() {
     }
   };
 
+  //actualizacion de foto en layout
   useEffect(() => {
     if (photoBase64) {
       setImageSrc(photoBase64);
     }
   }, [photoBase64, imageType]);
 
+  //actualizacion de mensajes en layout
   useEffect(() => {
     console.log('Response Data:', dataResponse);
     console.log("CARGANDO?");
@@ -172,15 +182,16 @@ export default function SignUp() {
     }
   }, [dataResponse,loading, error]);
 
+  //restricciones en layout
   const limitInput = (e) => {
     let inputValue = e.target.value;
 
-    // Ensure the value is not longer than 2 characters
+    // me aseguro que valor no es mayor a 2 caracteres
     if (inputValue.length > 2) {
       inputValue = inputValue.slice(0, 2);
     }
 
-    // Ensure the value doesn't exceed 99
+    // me aseguro que valor no supera el 99
     if (inputValue > 99) {
       inputValue = 99;
     }
@@ -192,7 +203,7 @@ export default function SignUp() {
     <>
     <h1 className='sign-up'>Quiero ser parte de Padel Club Argentina</h1>
     <div className='hero-container'>
-      <form onSubmit={handleSubmit} className='hero-container'>
+      <form onSubmit={handleSubmit} className='hero-container form-grid'>
               <div>
                   <h3 className="text-4xl font-medium">Alias</h3>
                   <FancyInput label="" placeholder="Ingrese su alias" type="text" value={formData.alias}
@@ -310,25 +321,24 @@ export default function SignUp() {
               </div>
               <div>
                   <h3 className="text-4xl font-medium">Tipo de juego</h3>
-                  <select label="" placeholder="reves, drive, indistinto" type="text" value={formData.tipoJuego}
-                    name="tipoJuego"
-                    className={`fancy-input ${errors.tipoJuego ? 'fancy-input-error' : ''}`}
+                  <select label="" placeholder="reves, drive, indistinto" type="text" value={formData.tipoDeJuego}
+                    name="tipoDeJuego"
+                    className={`fancy-input ${errors.tipoDeJuego ? 'fancy-input-error' : ''}`}
                     onChange={handleChange}>
                      <option value="" disabled>Select tipo de juego</option>
-                      {optionsTipoJuego.map(option => (
+                      {optionsTipoDeJuego.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
                       ))}
                   </select>
-                    {errors.tipoJuego && <p className="error">{errors.tipoJuego}</p>}
+                    {errors.tipoDeJuego && <p className="error">{errors.tipoDeJuego}</p>}
               </div>
               <div>
-                  <FancyInput label="" placeholder="" type="hidden" value={formData.idTipoUsuario}
-                    name="idTipoUsuario"
-                    className={`fancy-input ${errors.idTipoUsuario ? 'fancy-input-error' : ''}`}
-                    onChange={handleChange} />
-                    {errors.idTipoUsuario && <p className="error">{errors.idTipoUsuario}</p>}
+                <h3 className="text-4xl font-medium">Vista previa de la imagen</h3>
+                <div className="image-preview">
+                  {imageSrc && <img src={imageSrc} alt="Preview" style={{maxWidth: '100%', height: 'auto'}} />}
+                </div>
               </div>
               <div>
                 <h3 className="text-4xl font-medium">Foto de perfil</h3>
@@ -338,12 +348,16 @@ export default function SignUp() {
                   onChange={handlePhotoChange} />
                   {errors.fotoperfil && <p className="error">{errors.fotoperfil}</p>}
               </div>
-              {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
-              <button type="submit"  className="btns btn--outline btn--large">Enviar</button>
-      </form>
-      <div style={{width:100, height:100}}>
-              {imageSrc && <img src={imageSrc} alt="Preview" />}
+              <div>
+                  <FancyInput label="" placeholder="" type="hidden" value={formData.idTipoUsuario}
+                    name="idTipoUsuario"
+                    className={`fancy-input ${errors.idTipoUsuario ? 'fancy-input-error' : ''}`}
+                    onChange={handleChange} />
+                    {errors.idTipoUsuario && <p className="error">{errors.idTipoUsuario}</p>}
               </div>
+              <button type="submit"  className="btns btn btn--outline btn--large">Enviar</button>
+              {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
+      </form>
       </div>  
       <ToastContainer />
     </>
