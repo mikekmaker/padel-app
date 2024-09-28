@@ -5,6 +5,12 @@ export function UseFetch(url, action, body = null) {
   const [dataResponse, setDataResponse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const getHeaders = {
+    'Content-Type': 'application/json',
+    'accept':'application/json',
+    "ngrok-skip-browser-warning": "69420",
+  };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -16,10 +22,17 @@ export function UseFetch(url, action, body = null) {
           case 'NONE': 
             break;
           case 'GET':
-            response = await axios.get(url);
+            response = await axios.get(url, {getHeaders});
+            console.log("obtengo reservas...");
+            console.log(response.data);
             break;
           case 'POST':
             if (body !== null && body !== undefined) {
+                    console.log("esto es lo que envio:");
+                    for (let pair of body.entries()) {
+                      console.log(`${pair[0]}: ${pair[1]}`);
+                    }
+                    console.log(body);
                     response = await axios.post(url, body, {
                         headers: {
                         'Content-Type': 'application/json',
@@ -27,6 +40,7 @@ export function UseFetch(url, action, body = null) {
                         }
                     }
                     );
+                    console.log('Response:', response.data);
             }
             break;
           case 'PUT':

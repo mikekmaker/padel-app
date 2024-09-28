@@ -5,13 +5,55 @@ import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 import "react-big-calendar/lib/css/react-big-calendar.css"
 import dayjs from 'dayjs';
 import "dayjs/locale/es";
+import { UseFetch } from '../../UseFetch';
+import { Config } from '../../config';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 dayjs.locale("es");
 
 export default function Reservas() {
 
-  //mock JSON reserva
+  //JSON reservas
+  let url = `${Config.beApiPrefix}/reservas`;
+  let model = null;
+  const [action,setAction] = useState('NONE');
+  console.log(url);
+  const {dataResponse, loading, error} = UseFetch(url, action, model);
+  const [items, setItems] = useState([]);
 
+  const handleFetchItems = async () => {
+    setAction('GET');
+  }
+
+  //fetch reservas
+  useEffect(() => {
+    console.log('Response Data:', dataResponse);
+    console.log("CARGANDO?");
+    console.log('Loading:', loading);
+    console.log("QUE ERROR DEVUELVE USEFETCH?");
+    console.log('Error:', error);
+
+    if (loading) {
+      toast.info('Loading...', {autoClose: 500,});
+    }
+    else
+    {
+      if (error) {
+        toast.error(`${eventError}: ${error}`, {autoClose: 2000,});
+      }
+      if (dataResponse) {
+        toast.success(`${eventOk}`, {autoClose: 1500,});
+      }
+    }
+    setItems(dataResponse);
+  }, [dataResponse,loading, error]);
+
+   //mensajes
+   const eventOk = "Usuario registrado correctamente!";
+   const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
+   const mandatoryFieldMsg = "Este campo es obligatorio";
+   const eventError = "Se produjo un error inesperado!";
   
   //mock JSON horarios mock
   const horarios = [ 
@@ -111,6 +153,18 @@ export default function Reservas() {
   <div className='hero-container'>
       <h2 className='sign-up'>RESERVAS</h2>
       <div className='hero-container'>
+      <div>
+      <button onClick={handleFetchItems}>Fetch Items</button>
+      <ul>
+      {items && items.length > 0 ? (
+    items.map((item) => (
+      <li key={item.id}>{item.descripcion}</li>
+    ))
+  ) : (
+    <li>No items available</li>
+  )}
+      </ul>
+    </div>
           <div className="app-container">
           <Calendar 
           localizer={localizer}
