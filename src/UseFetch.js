@@ -14,6 +14,7 @@ export function UseFetch(url, action, body = null) {
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log("3) iniciando solicitud con axios...")
       setLoading(true);
       setError(null);
       try {
@@ -22,10 +23,14 @@ export function UseFetch(url, action, body = null) {
           case 'NONE': 
             break;
           case 'GET':
-            console.log("3) iniciando solicitud con axios...")
-            response = await axios.get(url, {getHeaders});
-            console.log("4) obtengo reservas...");
-            console.log(response.data);
+            response = await axios.get(url, {
+              headers: {
+              'ngrok-skip-browser-warning': 'ngrok-skip-browser-warning',
+              'Content-Type': 'application/json',
+              'accept':'application/json'
+              }
+              }
+            );
             break;
           case 'POST':
             if (body !== null && body !== undefined) {
@@ -53,6 +58,8 @@ export function UseFetch(url, action, body = null) {
           default:
             throw new Error('Invalid action');
         }
+        console.log("4) obtengo reservas...");
+            console.log(response.data);
         setDataResponse(response.data);
       } catch (err) {
         setError(err.message);
