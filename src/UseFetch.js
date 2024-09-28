@@ -8,7 +8,7 @@ export function UseFetch(url, action, body = null) {
   const getHeaders = {
     'Content-Type': 'application/json',
     'accept':'application/json',
-    "ngrok-skip-browser-warning": "69420",
+    "ngrok-skip-browser-warning": "true",
   };
 
 
