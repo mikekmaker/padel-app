@@ -62,6 +62,7 @@ export function UseFetch(url, action, body = null) {
             console.log(response.data);
         setDataResponse(response.data);
       } catch (err) {
+        console.log("4) hubo un error de mierda:");
         setError(err.message);
       } finally {
         setLoading(false);
