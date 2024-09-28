@@ -22,8 +22,9 @@ export function UseFetch(url, action, body = null) {
           case 'NONE': 
             break;
           case 'GET':
+            console.log("3) iniciando solicitud con axios...")
             response = await axios.get(url, {getHeaders});
-            console.log("obtengo reservas...");
+            console.log("4) obtengo reservas...");
             console.log(response.data);
             break;
           case 'POST':
@@ -61,7 +62,7 @@ export function UseFetch(url, action, body = null) {
     };
 
     if(action !== 'NONE'){
-        console.log("enviando solicitud asyncrónica...");
+        console.log("2) enviando solicitud asyncrónica...");
         fetchData();
     }
   }, [url, action, body]);

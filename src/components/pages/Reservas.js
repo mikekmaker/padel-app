@@ -23,6 +23,7 @@ export default function Reservas() {
   const [items, setItems] = useState([]);
 
   const handleFetchItems = async () => {
+    console.log("1) enviando peticion al server...")
     setAction('GET');
   }
 
