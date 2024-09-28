@@ -12,7 +12,7 @@ export default function SignUp() {
 
   //formulario para el modelo
   const [formData, setFormData] = useState({
-    id: '0',
+    id: 1,
     alias: '',
     contrasena: '',
     recontrasena:'',
@@ -26,7 +26,7 @@ export default function SignUp() {
     telefono: '',
     nivel: '',
     tipoDeJuego:'',
-    fotoperfil: '',
+    fotoPerfil: '',
     idTipoUsuario: 3
   });
 
@@ -95,32 +95,28 @@ export default function SignUp() {
         // Creacion de objeto FormData para enviar instancia del modelo
         const data = new FormData();
         data.append('id', formData.id);
+        data.append('nivel', formData.nivel);
+        data.append('apellido', formData.apellido);
+        data.append('edad', formData.edad);
         data.append('alias', formData.alias);
         data.append('contrasena', formData.contrasena);
-        data.append('nombre', formData.nombre);
-        data.append('apellido', formData.apellido);
-        data.append('genero', formData.genero);
-        data.append('edad', formData.edad);
-        data.append('direccion', formData.direccion);
-        data.append('email', formData.email);
         data.append('telefono', formData.telefono);
-        data.append('nivel', formData.nivel); 
+        data.append('idTipoUsuario',formData.idTipoUsuario);
+        data.append('nombre', formData.nombre);
         data.append('tipoDeJuego',formData.tipoDeJuego);
-        data.append('idTipoUsuario',formData.idTipoUsuario)
+        data.append('email', formData.email); 
+        data.append('genero', formData.genero);
+        data.append('direccion', formData.direccion);
+        data.append('recontrasena',formData.recontrasena);
+        data.append('remail',formData.remail);
 
-        if (formData.fotoperfil) {
+        if (formData.fotoPerfil) {
              data.append('fotoPerfil', photoBase64);
         }
 
         try {
-            //Send data to the server
-            console.log("data a enviar:");
-            for (let pair of data.entries()) {
-              console.log(`${pair[0]}: ${pair[1]}`);
-            }
-            setAction('POST');
             setModel(data);
-            console.log('Form data submitted:', formData);
+            setAction('POST');
         } catch (error) {
           if (!error.response) {
             console.log(handleNetworkError(error));
@@ -203,7 +199,7 @@ export default function SignUp() {
     <>
     <h1 className='sign-up'>Quiero ser parte de Padel Club Argentina</h1>
     <div className='hero-container'>
-      <form onSubmit={handleSubmit} className='hero-container form-grid'>
+      <form  className='hero-container form-grid'>
               <div>
                   <h3 className="text-4xl font-medium">Alias</h3>
                   <FancyInput label="" placeholder="Ingrese su alias" type="text" value={formData.alias}
@@ -342,11 +338,11 @@ export default function SignUp() {
               </div>
               <div>
                 <h3 className="text-4xl font-medium">Foto de perfil</h3>
-                <FancyInput placeholder="Suba su foto" type="file" value={formData.fotoperfil}
-                  name="fotoperfil"
-                  className={`fancy-input ${errors.fotoperfil ? 'fancy-input-error' : ''}`}
+                <FancyInput placeholder="Suba su foto" type="file" value={formData.fotoPerfil}
+                  name="fotoPerfil"
+                  className={`fancy-input ${errors.fotoPerfil ? 'fancy-input-error' : ''}`}
                   onChange={handlePhotoChange} />
-                  {errors.fotoperfil && <p className="error">{errors.fotoperfil}</p>}
+                  {errors.fotoPerfil && <p className="error">{errors.fotoPerfil}</p>}
               </div>
               <div>
                   <FancyInput label="" placeholder="" type="hidden" value={formData.idTipoUsuario}
@@ -355,7 +351,7 @@ export default function SignUp() {
                     onChange={handleChange} />
                     {errors.idTipoUsuario && <p className="error">{errors.idTipoUsuario}</p>}
               </div>
-              <button type="submit"  className="btns btn btn--outline btn--large">Enviar</button>
+              <button onClick={handleSubmit}  className="btns btn btn--outline btn--large">Enviar</button>
               {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
       </form>
       </div>  
