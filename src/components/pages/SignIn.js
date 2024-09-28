@@ -63,8 +63,8 @@ export default function SignIn() {
         data.append('contrasena', formData.contrasena);
 
         try {
-            setAction('POST');
             setModel(data);
+            setAction('POST');
             console.log('Form data submitted:', formData);
         } catch (error) {
           if (!error.response) {
