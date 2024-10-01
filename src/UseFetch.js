@@ -5,11 +5,11 @@ export function UseFetch(url, action, body = null) {
   const [dataResponse, setDataResponse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const getHeaders = {
-    "ngrok-skip-browser-warning": "ngrok-skip-browser-warning",
-    'Content-Type': 'application/json',
-    'accept':'application/json',
-  };
+  // const getHeaders = {
+  //   "ngrok-skip-browser-warning": "ngrok-skip-browser-warning",
+  //   'Content-Type': 'application/json',
+  //   'accept':'application/json',
+  // };
 
 
   useEffect(() => {
