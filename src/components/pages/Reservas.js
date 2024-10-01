@@ -98,7 +98,7 @@ export default function Reservas() {
   };
 
   // State to hold the calculated datetime
-  const [datetime, setDateTime] = useState('');
+  const [datetime, setDatetime] = useState('');
   // Function to add hours to a datetime string
   const addHours = (start, hours) => {
     const date = new Date(start);
@@ -108,7 +108,7 @@ export default function Reservas() {
   useEffect(() => {
     // Calculate the new datetime by adding the hours
     const calculatedDateTime = addHours(jsonData.start, jsonData.hours);
-    setDateTime(calculatedDateTime);
+    setDatetime(calculatedDateTime);
   }, [jsonData.start, jsonData.hours]);
 
   return (
@@ -133,7 +133,7 @@ export default function Reservas() {
        <input
         type="datetime-local"
         value={datetime}
-        onChange={(e) => setDateTime(e.target.value)}
+        onChange={(e) => setDatetime(e.target.value)}
        />
         <div className='hero-btns'>
           <Button
