@@ -6,6 +6,10 @@ import Home from './components/pages/Home';
 import SignUp from './components/pages/SignUp';
 import SignIn from './components/pages/SignIn';
 import Reservas from './components/pages/Reservas';
+import '@fontsource/roboto/300.css'; // Light
+import '@fontsource/roboto/400.css'; // Regular
+import '@fontsource/roboto/500.css'; // Medium
+import '@fontsource/roboto/700.css'; // Bold
 
 function App() {
   return (
