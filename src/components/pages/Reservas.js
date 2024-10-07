@@ -9,6 +9,7 @@ import { UseFetch } from '../../UseFetch';
 import { Config } from '../../config';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import WeatherForecast from '../Weatherforecast';
 
 dayjs.locale("es");
 
@@ -120,6 +121,7 @@ export default function Reservas() {
         <button onClick={handleFetchItems}>Fetch Items</button>
       </div>
           <div className="app-container">
+          <WeatherForecast/>
           <Calendar 
           localizer={localizer}
           messages={messages}
@@ -152,7 +154,6 @@ export default function Reservas() {
           >
             Limpiar <i className='fa fas fa-refresh' />
           </Button>
-          <h3 className='sign-up'>TEMPERATURA ACTUAL 25&#176;C</h3>
         </div>
     </div>
     <ToastContainer /></>

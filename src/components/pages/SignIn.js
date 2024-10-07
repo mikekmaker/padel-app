@@ -7,6 +7,7 @@ import {handleServerError,handleNetworkError} from '../../components/HandlerErro
 import { UseFetch } from '../../UseFetch';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import WeatherForecast from '../Weatherforecast'; 
 
 export default function SignIn() {
 
@@ -129,7 +130,7 @@ export default function SignIn() {
       </div>
       {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
       </form>
-      <h3 className='sign-up'>TEMPERATURA ACTUAL 25&#176;C</h3>
+      <WeatherForecast />
   </div>
 
 
