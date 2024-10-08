@@ -10,6 +10,7 @@ import { Config } from '../../config';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WeatherForecast from '../Weatherforecast';
+import Footer from '../Footer';
 
 dayjs.locale("es");
 
@@ -156,6 +157,8 @@ export default function Reservas() {
           </Button>
         </div>
     </div>
-    <ToastContainer /></>
+    <ToastContainer />
+    <Footer/>
+    </>
 );
 }

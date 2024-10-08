@@ -7,6 +7,7 @@ import { handleServerError, handleNetworkError } from '../../components/HandlerE
 import { UseFetch } from '../../UseFetch';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Footer from '../Footer';
 
 export default function SignUp() {
 
@@ -356,6 +357,7 @@ export default function SignUp() {
       </form>
       </div>  
       <ToastContainer />
+      <Footer/>
     </>
   );
 }

@@ -8,6 +8,7 @@ import { UseFetch } from '../../UseFetch';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WeatherForecast from '../Weatherforecast'; 
+import Footer from '../Footer';
 
 export default function SignIn() {
 
@@ -100,6 +101,7 @@ export default function SignIn() {
   }, [dataResponse,loading, error]);
 
   return ( 
+  <>
   <div className='hero-container'>
       <ToastContainer />
       <h3 className='sign-up'>INGRESAR A PADEL ARGENTINA</h3>
@@ -132,7 +134,7 @@ export default function SignIn() {
       </form>
       <WeatherForecast />
   </div>
-
-
+  <Footer/>
+  </>
 );
 }
