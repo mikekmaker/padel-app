@@ -5,6 +5,7 @@ export function UseFetch(url, action, body = null) {
   const [dataResponse, setDataResponse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [statusCode, setStatusCode] = useState(null);
   // const getHeaders = {
   //   "ngrok-skip-browser-warning": "ngrok-skip-browser-warning",
   //   'Content-Type': 'application/json',
@@ -61,9 +62,15 @@ export function UseFetch(url, action, body = null) {
         console.log("4) obtengo datos...");
             console.log(response.data);
         setDataResponse(response.data);
+        setStatusCode(response.status);
       } catch (err) {
-        console.log("4) hubo un error de mierda:");
-        setError(err.message);
+        console.log("4) hubo un error:");
+        if (err.response) {  // Si el error tiene respuesta (como un 404 o 500)
+          setError(`Error ${err.response.status}: ${err.response.statusText}`);
+          setStatusCode(err.response.status);  // Guardar código de error
+        } else {
+          setError(err.message);  // Errores de red u otros
+        }
       } finally {
         setLoading(false);
       }
@@ -75,5 +82,5 @@ export function UseFetch(url, action, body = null) {
     }
   }, [url, action, body]);
 
-  return { dataResponse, loading, error };
+  return { dataResponse, statusCode, loading, error };
 }
