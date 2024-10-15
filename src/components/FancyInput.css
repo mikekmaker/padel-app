@@ -21,6 +21,11 @@
     border-radius: 8px;
     transition: all 0.3s ease;
     outline: none;
+   /* width: 100%;          /* Make sure both inputs take up the same width */
+   /* max-width: 400px;      /* Optional: Set a max width for alignment */
+   /* padding: 8px;
+   /* margin-top: 8px;       /* Space between the label and input */
+   /* box-sizing: border-box;*/
 }
 
 .fancy-input:focus {

@@ -14,7 +14,7 @@ import Footer from '../Footer';
 
 dayjs.locale("es");
 
-export default function Reservas() {
+export default function Horarios() {
   //Big Calendar Configuration
   const messages = {
     allDay: "Todo el dia",
@@ -51,7 +51,7 @@ export default function Reservas() {
   // Map the array to the format expected by react-big-calendar
   const handleDataFetched = (items) => {
     const mappedEvents = items.map(item => ({
-      title: item.reserva ? item.reserva.descripcion : "Libre para reservar", // Check if reserva exists
+      title: item.reserva ? item.reserva.descripcion : "Libre",
       start: new Date(`${item.fecha}T${item.hora}`),
       end: new Date(`${item.fecha}T${parseInt(item.hora.split(':')[0]) + 1}:00`), // Assuming 1 hour duration
       resource: item.reserva || {} // If no reserva, use an empty object or fallback data
@@ -75,11 +75,14 @@ export default function Reservas() {
       if (error) {
         toast.error(`${eventError}: ${error}`, {autoClose: 2000,});
       }
-      if (dataResponse) {
-        toast.success(`${eventOk}`, {autoClose: 1500,});
-        console.log("tengo datos!!")
-        console.log(dataResponse);
-        handleDataFetched(dataResponse);
+      else
+      {
+        if (dataResponse) {
+          toast.success(`${eventOk}`, {autoClose: 1500,});
+          console.log("tengo datos!!")
+          console.log(dataResponse);
+          handleDataFetched(dataResponse);
+        }
       }
     }
   }, [dataResponse,loading, error]);
@@ -88,7 +91,7 @@ export default function Reservas() {
    const eventOk = "Horarios actualizados exitosamente";
    //const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
    //const mandatoryFieldMsg = "Este campo es obligatorio";
-   const eventError = "Se produjo un error inesperado!";
+   const eventError = "Se produjo un error";
 
   // Ejemplo de dato seleccionado a mostrar
   const jsonData = {
@@ -116,7 +119,7 @@ export default function Reservas() {
   return (
   <>
   <div className='hero-container'>
-      <h2 className='sign-up'>RESERVAS</h2>
+      <h2 className='sign-up'>HORARIOS</h2>
       <div className='hero-container'>
       <div>
         <button onClick={handleFetchItems}>Fetch Items</button>
