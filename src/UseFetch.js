@@ -26,7 +26,7 @@ export function UseFetch(url, action, body = null) {
           case 'GET':
             response = await axios.get(url, {
               headers: {
-              'ngrok-skip-browser-warning': 'ngrok-skip-browser-warning',
+              //'ngrok-skip-browser-warning': 'ngrok-skip-browser-warning',
               'Content-Type': 'application/json',
               'accept':'application/json'
               }
@@ -47,7 +47,6 @@ export function UseFetch(url, action, body = null) {
                         }
                     }
                     );
-                    console.log('Response:', response.data);
             }
             break;
           case 'PUT':
@@ -60,12 +59,11 @@ export function UseFetch(url, action, body = null) {
             throw new Error('Invalid action');
         }
         console.log("4) obtengo datos...");
-            console.log(response.data);
         setDataResponse(response.data);
         setStatusCode(response.status);
       } catch (err) {
         console.log("4) hubo un error:");
-        if (err.response) {  // Si el error tiene respuesta (como un 404 o 500)
+        if (err.response) {  // Si el error tiene respuesta con detalle
           setError(`Error ${err.response.status}: ${err.response.statusText}`);
           setStatusCode(err.response.status);  // Guardar código de error
         } else {
@@ -77,7 +75,7 @@ export function UseFetch(url, action, body = null) {
     };
 
     if(action !== 'NONE'){
-        console.log("2) enviando solicitud asyncrónica...");
+        console.log("2) enviando solicitud asincr\u00F3nica...");
         fetchData();
     }
   }, [url, action, body]);
