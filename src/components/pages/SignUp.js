@@ -3,7 +3,7 @@ import { Config } from '../../config';
 import '../../App.css';
 import './Forms.css';
 import { FancyInput } from '../../components/FancyInput';
-import { handleServerError, handleNetworkError } from '../../components/HandlerError';
+import { handleError } from '../../components/HandlerError';
 import { UseFetch } from '../../UseFetch';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -36,7 +36,7 @@ export default function SignUp() {
   const [action,setAction] = useState('NONE');
   let url = `${Config.boApiPrefix}/usuarios`;
   console.log(url);
-  const {dataResponse, loading, error} = UseFetch(url, action, model);
+  const {dataResponse, statusCode, loading, error} = UseFetch(url, action, model);
 
   //manejo de imagenes
   const [photoBase64, setPhotoBase64] = useState('');
@@ -62,7 +62,7 @@ export default function SignUp() {
   const eventOk = "Usuario registrado correctamente!";
   const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
   const mandatoryFieldMsg = "Este campo es obligatorio";
-  const eventError = "Se produjo un error inesperado!";
+  const eventError = "Se produjo un error";
 
   //inicialización de lista para validación de datos de formulario
   const [errors, setErrors] = useState({});
@@ -114,17 +114,8 @@ export default function SignUp() {
         if (formData.fotoPerfil) {
              data.append('fotoPerfil', photoBase64);
         }
-
-        try {
-            setModel(data);
-            setAction('POST');
-        } catch (error) {
-          if (!error.response) {
-            console.log(handleNetworkError(error));
-          } else {
-            console.log(handleServerError(error));
-          }
-        }
+        setModel(data);
+        setAction('POST');
       }
   };
 
@@ -164,20 +155,22 @@ export default function SignUp() {
     console.log('Loading:', loading);
     console.log("QUE ERROR DEVUELVE USEFETCH?");
     console.log('Error:', error);
-
+    console.log('Status',statusCode)
     if (loading) {
       toast.info('Loading...', {autoClose: 500,});
     }
     else
     {
       if (error) {
-        toast.error(`${eventError}: ${error}`, {autoClose: 2000,});
+        toast.error(`${eventError}: ${handleError(error, statusCode)}`, {autoClose: 2000,});
       }
-      if (dataResponse) {
+      else{
+        if (dataResponse) {
         toast.success(`${eventOk}`, {autoClose: 1500,});
+        }
       }
     }
-  }, [dataResponse,loading, error]);
+  }, [dataResponse, statusCode, loading, error]);
 
   //restricciones en layout
   const limitInput = (e) => {

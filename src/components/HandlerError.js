@@ -1,46 +1,46 @@
   export const handleNetworkError = (error) => {
-    console.error('Network error:', error.message);
-    console.log("connection refused or timed out.");
-    return 'Server is unreachable. Please try again later.';
+    console.error('Error de red:', error.message);
+    console.log("conexi\u00F3n rechazada o tiempo de espera agotado.");
+    return 'Servidor no alcanzado. Por favor int\u00E9ntelo m\u00E1s tarde.';
   };
   
-  export const handleServerError = (error) => {
-    const statusCode = error.response.status;
-    if (statusCode === 404) {
-      return 'Resource not found.';
-    } else if (statusCode === 500) {
-      return 'Internal server error. Please try again later.';
-    } else {
-            console.log("error manejable por respuesta del server:");
-            console.log("codigo de error:");
-            console.log(error.response.status);
-            if (error.response) {
-              if (error.response.status === 422) {
-                // Specific handling for 422 Unprocessable Entity
-                console.error('Validation error:', error.response.data);
-              } else {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                console.error('Error data:', error.response.data);
-                console.error('Error status:', error.response.status);
-                console.error('Error headers:', error.response.headers);
-              }
-            } else if (error.request) {
-                // The request was made but no response was received
-                console.error('Error request:', error.request);
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                console.error('Error message:', error.message);
-            }
-            console.error('Error config:', error.config);
-            return `An error occurred: ${statusCode}`;
+  export const handleServerError = (error, statusCode) => {
+    let errorDetail;
+    switch (statusCode) {
+      case 400:
+          errorDetail = "Error de validaci\u00F3n, uno de los campos no es correcto";
+          break;
+      case 401:
+          errorDetail = "Credenciales no v\u00E1lidas. Por favor, reinicie sesi\u00F3n para continuar.";
+          break;
+      case 403:
+          errorDetail = "No tiene permisos para acceder a este sitio. Contacte al administrador si cree que esto es un error";
+          break;
+      case 404:
+          errorDetail = 'Recurso no encontrado';
+          break;
+      case 409:
+          errorDetail = "Conflicto al procesar la solicitud. Es posible que el recurso ya haya sido creado/modificado.";
+          break;
+      case 500:
+          errorDetail = 'Error interno del servidor. Reintente mas tarde';
+          break;
+      case 422:
+          console.error('Error de validaci\u00F3n de datos', error);
+          errorDetail =  'Ocurri\u00F3 un error de validaci\u00F3n de datos.';
+          break;
+      default:
+          console.log("Error no manejable de respuesta del server:");
+          console.error('Error status:', statusCode);
+          errorDetail =  `Ocurri\u00F3 un error: ${error}`;
     }
-  };
+    return errorDetail;
+  }
   
-  export const handleError = (error) => {
-    if (!error.response) {
+  export const handleError = (error,statusCode) => {
+    if (!statusCode) {
       return handleNetworkError(error);
     } else {
-      return handleServerError(error);
+      return handleServerError(error, statusCode);
     }
   };  

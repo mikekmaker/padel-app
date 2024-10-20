@@ -11,6 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WeatherForecast from '../Weatherforecast';
 import Footer from '../Footer';
+import { handleError } from '../HandlerError';
 
 dayjs.locale("es");
 
@@ -40,7 +41,7 @@ export default function Horarios() {
   let model = null;
   const [action,setAction] = useState('NONE');
   console.log(url);
-  const {dataResponse, loading, error} = UseFetch(url, action, model);
+  const {dataResponse, statusCode, loading, error} = UseFetch(url, action, model);
   const [events, setEvents] = useState([]);
   const handleFetchItems = async () => {
     console.log("1) enviando peticion al server...")
@@ -59,13 +60,14 @@ export default function Horarios() {
 
     setEvents(mappedEvents);
   }
-  //fetch reservas
+  //fetch horarios
   useEffect(() => {
     console.log('Response Data:', dataResponse);
     console.log("CARGANDO?");
     console.log('Loading:', loading);
     console.log("QUE ERROR DEVUELVE USEFETCH?");
-    console.log('Error:', error);
+    console.log(error);
+    console.log('status:', statusCode);
 
     if (loading) {
       toast.info('Loading...', {autoClose: 500,});
@@ -73,7 +75,7 @@ export default function Horarios() {
     else
     {
       if (error) {
-        toast.error(`${eventError}: ${error}`, {autoClose: 2000,});
+        toast.error(`${eventError}: ${handleError(error, statusCode)}`, {autoClose: 2000,});
       }
       else
       {
@@ -85,36 +87,13 @@ export default function Horarios() {
         }
       }
     }
-  }, [dataResponse,loading, error]);
+  }, [dataResponse, statusCode, loading, error]);
 
    //mensajes
    const eventOk = "Horarios actualizados exitosamente";
    //const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
    //const mandatoryFieldMsg = "Este campo es obligatorio";
    const eventError = "Se produjo un error";
-
-  // Ejemplo de dato seleccionado a mostrar
-  const jsonData = {
-    start:"2024-08-30T19:45:00",
-    end: "2024-08-30T20:45:00",
-    id: 1,
-    title: "Prueba eventos",
-    hours: -3
-  };
-
-  // State to hold the calculated datetime
-  const [datetime, setDatetime] = useState('');
-  // Function to add hours to a datetime string
-  const addHours = (start, hours) => {
-    const date = new Date(start);
-    date.setHours(date.getHours() + hours);
-    return date.toISOString().slice(0, 16); // format as "YYYY-MM-DDTHH:MM"
-  };
-  useEffect(() => {
-    // Calculate the new datetime by adding the hours
-    const calculatedDateTime = addHours(jsonData.start, jsonData.hours);
-    setDatetime(calculatedDateTime);
-  }, [jsonData.start, jsonData.hours]);
 
   return (
   <>
@@ -130,35 +109,20 @@ export default function Horarios() {
           localizer={localizer}
           messages={messages}
           events={events}
-          defaultView="agenda"
+          defaultView="month"
           toolbar={true}
           style={{width:"70vw", height:"95vh",}} />
         </div>
       </div>
-       <p>Seleccione la fecha y hora del evento</p>
-       <input
-        type="datetime-local"
-        value={datetime}
-        onChange={(e) => setDatetime(e.target.value)}
-       />
-        <div className='hero-btns'>
-          <Button
-            className='btns'
-            buttonStyle='btn--outline'
-            buttonSize='btn--large'
-            linkTo='/acreditarme'
-          >
-            Guardar <i className='fa fas fa-save' />
-          </Button>
-          <Button
-            className='btns'
-            buttonStyle='btn--outline'
-            buttonSize='btn--large'
-            linkTo='/limpiar'
-          >
-            Limpiar <i className='fa fas fa-refresh' />
-          </Button>
-        </div>
+      <div className='hero-btns'>
+        <Button
+          className='btns'
+          buttonStyle='btn--outline'
+          buttonSize='btn--large'
+        >
+          Actualizar <i className='fa fas fa-refresh' />
+        </Button>
+      </div>
     </div>
     <ToastContainer />
     <Footer/>
