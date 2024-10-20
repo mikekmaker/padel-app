@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { isAuthenticated, logout } from '../helpers/authorization';
 import { Button } from './Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './NavBar.css';
 
 function Navbar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
+  const navigate = useNavigate(); // To navigate after logout
   const [click, setClick] = useState(false);
   const [button, setButton] = useState(true);
 
@@ -19,12 +22,26 @@ function Navbar() {
   };
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const result = await isAuthenticated();
+      setIsLoggedIn(result); // Update login status
+    };
+
+    checkAuth(); // Check authentication status on mount
     showButton();
+
     window.addEventListener('resize', showButton);
     return () => window.removeEventListener('resize', showButton);
   }, []);
 
   window.addEventListener('resize', showButton);
+
+  const handleLogout = () => {
+    logout(); // Implement the logout logic
+    setIsLoggedIn(false); // Update state after logout
+    navigate('/'); // Redirect after logout
+  };
+
 
   return (
     <nav className='navbar'>
@@ -38,8 +55,8 @@ function Navbar() {
           </div>
           <ul className={click ? 'nav-menu active' : 'nav-menu'}>
             <li className='nav-item'>
-              <Link to='/' className='nav-links' onClick={closeMobileMenu}>
-                Inicio
+              <Link to='/profile' className='nav-links' onClick={closeMobileMenu}>
+                Mi perfil
               </Link>
             </li>
             <li className='nav-item'>
@@ -61,16 +78,21 @@ function Navbar() {
               </Link>
             </li>
             <li className='nav-item'>
-              <Link
-                to='/registrarme'
-                className='nav-links-mobile'
-                onClick={closeMobileMenu}
-              >
-                Registrarme
-              </Link>
+              {isLoggedIn ? (
+                <Button buttonStyle='btn--outline' onClick={handleLogout}>SALIR</Button>
+                ) : (
+                  <Link
+                    to='/registrarme'
+                    className='nav-links-mobile'
+                    onClick={closeMobileMenu}
+                  >
+                    Registrarme
+                  </Link>
+                )
+              }
             </li>
           </ul>
-          {button && <Button buttonStyle='btn--outline' linkTo='/registrarme'>REGISTRARME</Button>}
+          {button && !isLoggedIn && <Button buttonStyle='btn--outline' linkTo='/registrarme'>REGISTRARME</Button>}
         </div>
       </nav>
   );
