@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import WeatherForecast from '../Weatherforecast';
 import Footer from '../Footer';
 import { handleError } from '../HandlerError';
+import { useNavigate } from 'react-router-dom';
 
 dayjs.locale("es");
 
@@ -43,7 +44,8 @@ export default function Horarios() {
   console.log(url);
   const {dataResponse, statusCode, loading, error} = UseFetch(url, action, model);
   const [events, setEvents] = useState([]);
-  const handleFetchItems = async () => {
+  
+  const getItems = async () => {
     console.log("1) enviando peticion al server...")
     setAction('GET');
   }
@@ -52,14 +54,45 @@ export default function Horarios() {
   // Map the array to the format expected by react-big-calendar
   const handleDataFetched = (items) => {
     const mappedEvents = items.map(item => ({
+      id: item.horario_id,
       title: item.reserva ? item.reserva.descripcion : "Libre",
       start: new Date(`${item.fecha}T${item.hora}`),
       end: new Date(`${item.fecha}T${parseInt(item.hora.split(':')[0]) + 1}:00`), // Assuming 1 hour duration
       resource: item.reserva || {} // If no reserva, use an empty object or fallback data
     }));
-
     setEvents(mappedEvents);
   }
+
+  //style events
+  // Custom event styling based on the presence of "reserva"
+  const eventPropGetter = (event) => {
+    const hasReserva = event.resource?.reserva_id; // Check if resource has "reserva"
+  
+    const style = {
+      backgroundColor: hasReserva ? 'lightcoral' : '#00FF7F', // Light red or tennis-ball green
+      borderRadius: '5px',
+      opacity: 0.8,
+      color: 'black',
+      border: '0px',
+      display: 'block',
+    };
+  
+    return { style };
+  };
+
+  //redirect
+  const navigate = useNavigate();
+  const handleSelectEvent = (event) => {
+    let exist = event.resource? event.resource.reserva_id : null;
+    if (exist) {
+      navigate(`/Horarios/${event.id}/Reserva/${exist}`);
+    } else {
+      console.log("reserva nueva")
+      navigate(`/Horarios/${event.id}/Reserva`);
+    }
+  };
+
+
   //fetch horarios
   useEffect(() => {
     console.log('Response Data:', dataResponse);
@@ -81,12 +114,12 @@ export default function Horarios() {
       {
         if (dataResponse) {
           toast.success(`${eventOk}`, {autoClose: 1500,});
-          console.log("tengo datos!!")
           console.log(dataResponse);
           handleDataFetched(dataResponse);
         }
       }
     }
+    getItems();
   }, [dataResponse, statusCode, loading, error]);
 
    //mensajes
@@ -100,17 +133,16 @@ export default function Horarios() {
   <div className='hero-container'>
       <h2 className='sign-up'>HORARIOS</h2>
       <div className='hero-container'>
-      <div>
-        <button onClick={handleFetchItems}>Fetch Items</button>
-      </div>
           <div className="app-container">
           <WeatherForecast/>
           <Calendar 
+          onSelectEvent={handleSelectEvent}
           localizer={localizer}
           messages={messages}
           events={events}
           defaultView="month"
           toolbar={true}
+          eventPropGetter={eventPropGetter}
           style={{width:"70vw", height:"95vh",}} />
         </div>
       </div>

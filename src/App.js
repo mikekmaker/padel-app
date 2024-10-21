@@ -8,6 +8,8 @@ import Horarios from './components/pages/Horarios';
 import SignIn from './components/pages/SignIn';
 import SignUp from './components/pages/SignUp';
 import Profile from './components/pages/Profile';
+import Reserva from './components/pages/Reserva';
+
 import '@fontsource/roboto/300.css'; // Light
 import '@fontsource/roboto/400.css'; // Regular
 import '@fontsource/roboto/500.css'; // Medium
@@ -26,6 +28,8 @@ function App() {
             <Route element={<ProtectedRoute />}>
                     <Route path="/profile" element={<Profile />} />
             </Route>
+            <Route path="/Horarios/:idHorario/Reserva" element={<Reserva />} />
+            <Route path="/Horarios/:idHorario/Reserva/:reservaId" element={<Reserva />} />
           </Routes>
       </Router>
     </>
