@@ -8,7 +8,7 @@
     let errorDetail;
     switch (statusCode) {
       case 400:
-          errorDetail = "Error de validaci\u00F3n, uno de los campos no es correcto";
+          errorDetail = `Error de validaci\u00F3n, solicitud incorrecta: ${error}`;
           break;
       case 401:
           errorDetail = "Credenciales no v\u00E1lidas. Por favor, reinicie sesi\u00F3n para continuar.";
