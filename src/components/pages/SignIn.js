@@ -22,7 +22,7 @@ export default function SignIn() {
       const checkAuth = async () => {
           const result = await isAuthenticated();
           if (result) {
-            navigate('/horarios', { replace: true });
+            navigate('/voy', { replace: true });
           }
       };
       checkAuth();
@@ -128,7 +128,7 @@ export default function SignIn() {
         }
       }
     }
-  }, [dataResponse,statusCode,loading, error]);
+  }, [dataResponse,statusCode,loading, error,navigate]);
 
   return ( 
   <>
