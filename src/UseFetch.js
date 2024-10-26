@@ -50,7 +50,19 @@ export function UseFetch(url, action, body = null) {
             }
             break;
           case 'PUT':
-            response = await axios.put(url, body);
+            if (body !== null && body !== undefined) {
+              console.log("esto es lo que envio:");
+              for (let pair of body.entries()) {
+                console.log(`${pair[0]}: ${pair[1]}`);
+              }
+              console.log(body);
+              response = await axios.put(url, body, {
+                headers: {
+                'Content-Type': 'application/json',
+                'accept':'application/json'
+                }
+            });
+            }
             break;
           case 'DELETE':
             response = await axios.delete(url);
