@@ -35,7 +35,6 @@ export default function SignIn() {
           }
           else
           {
-            toast.error(`${eventError}: Token no es valido`, {autoClose: 2000,});
             setTimeout(() => {
               navigate('/voy', { replace: true });
             }, 1500);
