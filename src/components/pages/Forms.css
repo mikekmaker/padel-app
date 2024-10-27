@@ -60,13 +60,32 @@
     align-items:flex-start;  /* Align labels and inputs to the left */
     width: 90%;  /* Ensure consistent width */
   }
-  
-  /* .fancy-input {
-    width: 100%;
-  } */
-  
-  /* .hero-container {
-    max-width: 1200px;
-    margin: 0 auto;
-  } */
+
+  .confirm-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999!important; /* Ensures modal is above everything */
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  /* General styles for the alert */
+.react-confirm-alert-body {
+  padding: 20px; /* Adjust padding as needed */
+  max-width: 400px!important; /* Set a max width for larger screens */
+  margin: auto; /* Center the alert */
+}
+
+/* Styles for screens less than 800px */
+@media (max-width: 800px) {
+  .react-confirm-alert-body {
+    padding: 10px; /* Reduce padding for smaller devices */
+    width: 70%!important; /* Make it take up most of the screen width */
+    box-shadow: none; /* Optionally remove box shadow */
+  }
+}
+
   

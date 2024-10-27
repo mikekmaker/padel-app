@@ -9,6 +9,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Footer from '../Footer';
 import { useNavigate } from 'react-router-dom';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { confirmAlert } from 'react-confirm-alert';
 
 export default function Profile() {
   //redirect
@@ -76,7 +78,7 @@ export default function Profile() {
     } else {
         toast.error('Sesión Agotada....');
         setTimeout(() => {
-        navigate('/login', { replace: true });
+        navigate('/voy', { replace: true });
         }, 1500);
     }
   }, [navigate,loading,isLoading]);
@@ -116,6 +118,30 @@ export default function Profile() {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value || '',}));
     setErrors({ ...errors, [name]: '' });             
+  };
+
+  //eliminación de perfil
+  const handleDelete = (e) => {
+    e.preventDefault();
+    confirmAlert({
+      title: 'Confirmar eliminacion',
+      message: '¿Seguro que quiere eliminar su perfil?',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: async () => {
+            setUrl(`${Config.boApiPrefix}/usuarios/${formData.id}`);
+            setAction('DELETE');
+            toast.success('Perfil eliminado correctamente!');
+            setTimeout(() => navigate('/', { replace: true }), 1500);
+          }
+        },
+        {
+          label: 'No',
+          onClick: () => toast.info('Eliminación cancelada.')
+        }
+      ]
+    });
   };
   
   //envio de formulario
@@ -388,7 +414,8 @@ export default function Profile() {
                     onChange={handleChange} />
                     {errors.idTipoUsuario && <p className="error">{errors.idTipoUsuario}</p>}
               </div>
-              <button onClick={handleSubmit}  className="btns btn btn--outline btn--large">Enviar</button>
+              <button onClick={handleSubmit} className="btns btn btn--outline btn--large">Enviar</button>
+              <button onClick={handleDelete} className="btns btn btn--outline btn--large" style={{ zIndex: 2, position: 'relative' }}>Eliminar</button>
               {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
       </form>
       </div>  
