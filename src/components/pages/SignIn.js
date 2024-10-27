@@ -17,12 +17,28 @@ export default function SignIn() {
   //redirect
   const navigate = useNavigate();
 
+  //mensajes
+  const eventOk = "Usuario logueado correctamente!";
+  const mandatoryFieldMsg = "Este campo es obligatorio";
+  const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
+  const eventError = "Se produjo un error";
+
   //checkAuth solo en login
   useEffect(() => {
       const checkAuth = async () => {
           const result = await isAuthenticated();
           if (result) {
-            navigate('/voy', { replace: true });
+            toast.success(`${eventOk}: Token valido`, {autoClose: 2000,});
+            setTimeout(() => {
+              navigate('/profile', { replace: true });
+            }, 1500);
+          }
+          else
+          {
+            toast.error(`${eventError}: Token no es valido`, {autoClose: 2000,});
+            setTimeout(() => {
+              navigate('/voy', { replace: true });
+            }, 1500);
           }
       };
       checkAuth();
@@ -41,12 +57,6 @@ export default function SignIn() {
   let url = `${Config.boApiPrefix}/login`;
   console.log(url);
   const {dataResponse, statusCode, loading, error} = UseFetch(url, action, model);
-
-  //mensajes
-  const eventOk = "Usuario logueado correctamente!";
-  const mandatoryFieldMsg = "Este campo es obligatorio";
-  const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
-  const eventError = "Se produjo un error";
 
   //manejo de password visible
   //const [password, setPassword] = useState("");
