@@ -3,16 +3,19 @@ import { Config } from '../../config';
 import '../../App.css';
 import './Forms.css';
 import { FancyInput } from '../../components/FancyInput';
-import { handleServerError, handleNetworkError } from '../../components/HandlerError';
+import { handleError } from '../../components/HandlerError';
 import { UseFetch } from '../../UseFetch';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Footer from '../Footer';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
-   //formulario para el modelo
+  //redirect
+  const navigate = useNavigate();
+  //formulario para el modelo
   const [formData, setFormData] = useState({
-    id: 1,
+    id: '',
     alias: '',
     contrasena: '',
     recontrasena:'',
@@ -27,18 +30,20 @@ export default function Profile() {
     nivel: '',
     tipoDeJuego:'',
     fotoPerfil: '',
-    idTipoUsuario: 3
+    idTipoUsuario:''
   });
 
-  //datos de sesión
-  const[nombreCompleto,setNombreCompleto] = useState('');
-
-  //envio de datos
+  //manejo de solicitudes
+  const [loading, setLoading] = useState(true);
   const [model,setModel] = useState(null);
   const [action,setAction] = useState('NONE');
-  let url = `${Config.boApiPrefix}/usuarios`;
-  console.log(url);
-  const {dataResponse, statusCode, loading, error} = UseFetch(url, action, model);
+  const [url, setUrl] = useState('');
+
+  // Obtener datos del usuario usando UseFetch
+  const { dataResponse, statusCode, loading: isLoading, error } = UseFetch(url,action,model);    
+
+  //datos de sesión
+  const [nombreCompleto, setNombreCompleto] = useState('');
 
   //manejo de imagenes
   const [photoBase64, setPhotoBase64] = useState('');
@@ -52,35 +57,70 @@ export default function Profile() {
     { value: 'intermedio', label: 'Intermedio' },
     { value: 'avanzado', label: 'Avanzado' }
   ];
-  
+
   const optionsTipoDeJuego = [
     { value: 'reves', label: 'Reves' },
     { value: 'drive', label: 'Drive' },
     { value: 'indistinto', label: 'Indistinto' }
   ];
-  //fin inicializar controles
+  //fin inicializar controles									 
+    
+  // Obtener ID del usuario desde localStorage y generar la URL
+  useEffect(() => {
+    const idUsuario = localStorage.getItem('usuarioId');
+    if (loading || isLoading) {
+      toast.info('Loading...', {autoClose: 500,});
+    }
+    if (idUsuario) {
+      getMe(idUsuario);
+    } else {
+        toast.error('Sesión Agotada....');
+        setTimeout(() => {
+        navigate('/login', { replace: true });
+        }, 1500);
+    }
+  }, [navigate,loading,isLoading]);
 
   //mensajes
-  const eventOk = "Usuario registrado correctamente!";
+  const eventOk = "Perfil actualizado correctamente!";
   const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
   const mandatoryFieldMsg = "Este campo es obligatorio";
-  const eventError = "Se produjo un error";
+  const eventError = "Se produjo un error al actualizar perfil";
 
   //inicialización de lista para validación de datos de formulario
   const [errors, setErrors] = useState({});
   const [formErrorMessage, setFormErrorMessage] = useState('');
+    
+  //funcion para traer mis datos
+  const getMe = async (idUsuario) => {
+    console.log("1) enviando peticion de datos personal al server...")
+    let url = `${Config.boApiPrefix}/usuarios`;
+    setUrl(`${url}/${idUsuario}`);
+    setAction('GET');
+  }
 
-  //manejo de cambios en formulario
+  useEffect(() => {
+    if (dataResponse) {
+      setFormData(dataResponse);
+      setNombreCompleto(`${dataResponse.nombre} ${dataResponse.apellido}`);
+      setLoading(false);
+    }
+    if (error) {
+      handleError(error,statusCode);
+      setLoading(false);
+    }
+  }, [dataResponse, statusCode, loading, error]);
+  
+  // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: '' });
+    setFormData((prevData) => ({ ...prevData, [name]: value || '',}));
+    setErrors({ ...errors, [name]: '' });             
   };
-
+  
   //envio de formulario
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
+    e.preventDefault();              
     // Validaciones de formulario
     const newErrors = {};
     Object.keys(formData).forEach((key) => {
@@ -113,23 +153,15 @@ export default function Profile() {
         data.append('recontrasena',formData.recontrasena);
         data.append('remail',formData.remail);
 
-        if (formData.fotoPerfil) {
-             data.append('fotoPerfil', photoBase64);
+        if (formData.editFotoPerfil) {
+              data.append('fotoPerfil', photoBase64);
         }
 
-        try {
-            setModel(data);
-            setAction('POST');
-        } catch (error) {
-          if (!error.response) {
-            console.log(handleNetworkError(error));
-          } else {
-            console.log(handleServerError(error));
-          }
-        }
+        setModel(data);
+        setAction('PUT');
       }
   };
-
+  
   //manejador de cambios de foto
   const handlePhotoChange = (e) => {
     const { name, value } = e.target;
@@ -151,14 +183,14 @@ export default function Profile() {
       console.log("vaciado")
     }
   };
-
+  
   //actualizacion de foto en layout
   useEffect(() => {
     if (photoBase64) {
       setImageSrc(photoBase64);
     }
   }, [photoBase64, imageType]);
-
+  
   //actualizacion de mensajes en layout
   useEffect(() => {
     console.log('Response Data:', dataResponse);
@@ -174,33 +206,33 @@ export default function Profile() {
     else
     {
       if (error) {
-        toast.error(`${eventError}: ${error}`, {autoClose: 2000,});
+        toast.error(`${eventError}: ${handleError(error, statusCode)}`, {autoClose: 2000,});
       }
       else{
         if (dataResponse) {
-        toast.success(`${eventOk}`, {autoClose: 1500,});
+          toast.success(`${eventOk}`, {autoClose: 1500,});
         }
       }
     }
-  }, [dataResponse, statusCode, loading, error]);
+    }, [dataResponse, statusCode, loading, error]);
+  
+    //restricciones en layout
+    const limitInput = (e) => {
+      let inputValue = e.target.value;
+  
+      // me aseguro que valor no es mayor a 2 caracteres
+      if (inputValue.length > 2) {
+        inputValue = inputValue.slice(0, 2);
+      }
+  
+      // me aseguro que valor no supera el 99
+      if (inputValue > 99) {
+        inputValue = 99;
+      }
+      setEdad(inputValue);
+    };
 
-  //restricciones en layout
-  const limitInput = (e) => {
-    let inputValue = e.target.value;
-
-    // me aseguro que valor no es mayor a 2 caracteres
-    if (inputValue.length > 2) {
-      inputValue = inputValue.slice(0, 2);
-    }
-
-    // me aseguro que valor no supera el 99
-    if (inputValue > 99) {
-      inputValue = 99;
-    }
-    setEdad(inputValue);
-  };
-
-  return ( 
+  return (
     <>
     <h1 className='sign-up'>{`Hola `+nombreCompleto}</h1>
     <div className='hero-container'>
@@ -343,11 +375,11 @@ export default function Profile() {
               </div>
               <div>
                 <h3 className="text-4xl font-medium">Foto de perfil</h3>
-                <FancyInput placeholder="Suba su foto" type="file" value={formData.fotoPerfil}
-                  name="fotoPerfil"
-                  className={`fancy-input ${errors.fotoPerfil ? 'fancy-input-error' : ''}`}
+                <FancyInput placeholder="Suba su foto" type="file" value={formData.editFotoPerfil}
+                  name="editFotoPerfil"
+                  className={`fancy-input ${errors.editFotoPerfil ? 'fancy-input-error' : ''}`}
                   onChange={handlePhotoChange} />
-                  {errors.fotoPerfil && <p className="error">{errors.fotoPerfil}</p>}
+                  {errors.editFotoPerfil && <p className="error">{errors.editFotoPerfil}</p>}
               </div>
               <div>
                   <FancyInput label="" placeholder="" type="hidden" value={formData.idTipoUsuario}
