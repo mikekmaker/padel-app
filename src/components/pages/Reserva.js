@@ -1,238 +1,293 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { UseFetch } from '../../UseFetch';
 import { Config } from '../../config';
 import './Forms.css';
+import { FancyInput } from '../../components/FancyInput';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Footer from '../Footer';
+import { handleError } from '../../components/HandlerError';
+import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { confirmAlert } from 'react-confirm-alert';
 
 export default function ReservaForm() {
+  //redirect
+  const navigate = useNavigate();
+  // Capturo horario_id y reserva_id de la URL
+  const { idHorario, reservaId } = useParams(); 
+  //inicializo variables para manejo de solicitudes
+  const [action,setAction] = useState('NONE');
+  const [url, setUrl] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isloading, setLoading] = useState(true);
+  const [descripcionHorario,setDescripcionHorario]= useState('');
+
+  //inicialización de lista para validación de datos de formulario
+  const [errors, setErrors] = useState({});
+  const [formErrorMessage, setFormErrorMessage] = useState('');
+
+   //mensajes
+   const eventOk = "Reserva guardada correctamente!";
+   const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
+   const mandatoryFieldMsg = "Este campo es obligatorio";
+   const eventError = "Se produjo un error";
+  
   const [formData, setFormData] = useState({
-    reserva_id: '', 
+    reserva_id: reservaId || '', 
     cancha_id: '',
-    usuario_id: '', 
-    horario_id: '', 
+    usuario_id: '1', 
+    horario_id: idHorario || '', 
+    fecha: '',
+    hora: '',
     descripcion: '', 
     num_personas: ''
   });
 
-  const [submitAction, setSubmitAction] = useState(null);  // Track submission action
-  const [isSubmitting, setIsSubmitting] = useState(false);
+   //inicializar opciones de controles
+   //TODO: Reemplazarlo por get de API gestion
+   const optionsCancha = [
+    { value: '1', label: 'Cancha A' },
+    { value: '2', label: 'Cancha B' },
+    { value: '3', label: 'Cancha C' }
+  ];
 
-  // Using the UseFetch hook to make API calls
-  //reserva crear
-  let url = `${Config.beApiPrefix}/reserva`;
+  //llamada generica
   const { dataResponse, statusCode, loading, error } = UseFetch(
     url,
-    submitAction,
-    submitAction === 'POST' ? formData : null
+    action,
+    (action === 'POST' || action === 'PUT') ? formData : null
   );
 
+  // // Funcion para traer detalles de horario basado en horario_id
+  // const fetchHorarioReserva = async (id) => {
+  //   if(id){
+  //     console.log("1) armando peticion para enviar al server...")
+  //     let urlh = `${Config.beApiPrefix}/horariosreservas`;
+  //     let filter = `horario_id=${idHorario}`;
+  //     console.log(`${urlh}?${filter}`);
+  //     setUrl(`${urlh}?${filter}`);
+  //     setAction('GET');
+  //   }
+  // }
+  const fetchHorarioReserva = useCallback((id) => {
+    if(id){
+      console.log("1) armando peticion para enviar al server...")
+      let urlh = `${Config.beApiPrefix}/horariosreservas`;
+      let filter = `horario_id=${idHorario}`;
+      console.log(`${urlh}?${filter}`);
+      setUrl(`${urlh}?${filter}`);
+      setAction('GET');
+    }
+  },[idHorario]);
+
+  // Fetch horario reserva en el evento load
+  useEffect(() => {
+      fetchHorarioReserva(idHorario);
+  }, [idHorario,fetchHorarioReserva]);
+
+  useEffect(() => {
+    if (dataResponse && isloading) {
+      // Extraemos y formateamos el objeto para ajustarse a formData
+      const formattedData = {
+        reserva_id: dataResponse[0].reserva?.reserva_id || reservaId || '', 
+        cancha_id: dataResponse[0].reserva?.cancha?.cancha_id || '', 
+        usuario_id: dataResponse[0].reserva?.usuario_id || '1',
+        horario_id: dataResponse[0].horario_id || idHorario || '', 
+        fecha: dataResponse[0].fecha || '',
+        hora: dataResponse[0].hora || '',
+        descripcion: dataResponse[0].reserva?.descripcion || '', 
+        num_personas:  dataResponse[0].reserva?.num_personas || ''
+      };
+      setNumPersonas(formattedData.num_personas);
+      setDescripcionHorario(`${formattedData.fecha} ${formattedData.hora}`);
+      console.log(formattedData);
+      setFormData(formattedData);
+      //formatear horario
+      setLoading(false);
+    }
+    if (error) {
+      handleError(error,statusCode);
+      setLoading(false);
+    }
+  }, [dataResponse, statusCode, isloading, error,idHorario,reservaId]);
+
+  // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prevData) => ({ ...prevData, [name]: value || '',}));
+    setErrors({ ...errors, [name]: '' });             
+  };
+
+  // UseFetch hook para hacer llamadas a APIs
+  //reserva crear
+  const upsertReserva = async (action, formData) => {
+    setAction('NONE');
+    const data = new FormData();
+    data.append('reserva_id',formData.reserva_id);
+    data.append('cancha_id', formData.cancha_id);
+    data.append('usuario_id', formData.usuario_id);
+    data.append('horario_id', formData.horario_id);
+    data.append('descripcion', formData.descripcion);
+    data.append('num_personas', formData.num_personas);
+    setFormData(data);
+    let target = action === 'POST' ? "reserva" : `reserva\\${formData.reserva_id}`
+    console.log("destino");
+    console.log(target);
+    setUrl(`${Config.beApiPrefix}/${target}`);
+    setAction(action);
+  }
+
+  // Función para validar el formulario
+  const validateForm = () => {
+    const validationErrors = {};
+    if (!formData.cancha_id) validationErrors.cancha_id = mandatoryFieldMsg;//'Cancha es obligatoria';
+    if (!formData.horario_id) validationErrors.horario_id = mandatoryFieldMsg;//'Horario es obligatorio';
+    if (!formData.descripcion) validationErrors.descripcion = mandatoryFieldMsg;// 'Descripci\u00F3n es obligatoria';
+    if (!formData.num_personas) validationErrors.num_personas = mandatoryFieldMsg;//'N\u00FAmero de personas es obligatorio';
+
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0; // true si no hay errores
+  };
+
+  //eliminación de perfil
+  const handleDelete = (e) => {
+    e.preventDefault();
+    confirmAlert({
+      title: 'Confirmar eliminaci\u00F3n',
+      message: '\u00BFSeguro que quiere eliminar su reserva?',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: async () => {
+            setUrl(`${Config.beApiPrefix}/reserva/${formData.reserva_id}`);
+            setAction('DELETE');
+            toast.success('\u00A1Reserva eliminada correctamente!');
+            setTimeout(() => navigate('/horarios', { replace: true }), 1500);
+          }
+        },
+        {
+          label: 'No',
+          onClick: () => toast.info('Eliminaci\u00F3n cancelada.')
+        }
+      ]
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitting(true); // Set loading state
-    setSubmitAction('POST');  // Trigger POST request
+
+    if (validateForm()) {
+      setIsSubmitting(true);
+      let action = reservaId === undefined ? 'POST' : 'PUT'
+      upsertReserva(action,formData);
+    } else {
+      setFormErrorMessage(incompleteFieldsError);
+    }
   };
   
   // Monitor API response after submission
   useEffect(() => {
-    if (!loading && isSubmitting) {
-      if (statusCode === 201) {
-        alert('Reserva creada exitosamente!');
-      } else if (error) {
-        alert(`Error al crear reserva: ${error}`);
-      }
-      setIsSubmitting(false); // Reset submitting state
+    if (loading) {
+      toast.info('Loading...', {autoClose: 500,});
     }
-  }, [loading, statusCode, error, isSubmitting]);
+    else if(!loading && isSubmitting)
+    {
+      if (error) {
+        toast.error(`${eventError}: ${handleError(error, statusCode)}`, {autoClose: 2000,});
+      }
+      else{
+        if (dataResponse) {
+          toast.success(`${eventOk}`, {autoClose: 1500,});
+          setTimeout(() => navigate('/horarios', { replace: true }), 1500);
+        }
+      }
+      setIsSubmitting(false);
+    }
+  }, [loading, statusCode, error, isSubmitting, dataResponse,navigate]);
+
+  
+
+  //manejo de campos numericos
+  const [numPersonas, setNumPersonas] = useState('');
+
+   //restricciones en layout
+   const limitInput = (e) => {
+    let inputValue = e.target.value;
+
+    // me aseguro que valor no es mayor a 2 caracteres
+    if (inputValue.length > 2) {
+      inputValue = inputValue.slice(0, 2);
+    }
+
+    // me aseguro que valor no supera el 99
+    if (inputValue > 16) {
+      inputValue = 16;
+    }
+    setNumPersonas(inputValue);
+  };
 
   return (
+  <>
     <div className="hero-container">
       <h3 className="sign-up">Reservar Cancha</h3>
-      <form onSubmit={handleSubmit} className="hero-container">
+      <form onSubmit={handleSubmit} className="hero-container form-grid">
         {/* Hidden Fields */}
         <input type="hidden" name="reserva_id" value={formData.reserva_id} />
         <input type="hidden" name="usuario_id" value={formData.usuario_id} />
+        <input type="hidden" name="horario_id" value={formData.horario_id} />
 
         <div className="form-group">
-          <label htmlFor="cancha_id">Cancha</label>
-          <select 
-            name="cancha_id" 
-            value={formData.cancha_id} 
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione una cancha</option>
-            <option value="1">Cancha 1</option>
-            <option value="2">Cancha 2</option>
-            <option value="3">Cancha 3</option>
-          </select>
+          <h3 className="text-4xl font-medium">Fecha y Hora del Evento</h3>
+              <FancyInput label="" placeholder="Fecha y Hora del Evento" type="text" value={descripcionHorario}
+                name="descripcionHorario" readOnly="readOnly"/>
         </div>
+        <div className="form-group">
+            <h3 className="text-4xl font-medium">Descripci&oacute;n</h3>
+            <FancyInput label="" placeholder="Descripcion" type="text" value={formData.descripcion}
+              name="descripcion"
+              className={`fancy-input ${errors.descripcion ? 'fancy-input-error' : ''}`}
+              onChange={handleChange} />
+              {errors.descripcion && <p className="error">{errors.descripcion}</p>}
+        </div>
+        <div></div>
 
         <div className="form-group">
-          <label htmlFor="horario_id">Horario</label>
-          <input 
-            type="text" 
-            name="horario_id" 
-            value={formData.horario_id} 
-            readOnly 
-          />
+                  <h3 className="text-4xl font-medium">Cancha</h3>
+                  <select label="" placeholder="ej: Cancha A" type="text" value={formData.cancha_id}
+                    name="cancha_id"
+                    className={`fancy-input ${errors.cancha_id ? 'fancy-input-error' : ''}`}
+                    onChange={handleChange}>
+                    <option value="" disabled>Seleccione Cancha</option>
+                    {optionsCancha.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.cancha_id && <p className="error">{errors.cancha_id}</p>}
         </div>
-
-        <div className="form-group">
-          <label htmlFor="descripcion">Descripción</label>
-          <input 
-            type="text" 
-            name="descripcion" 
-            value={formData.descripcion} 
-            onChange={handleChange} 
-            required 
-          />
+        <div className='form-group'>
+            <h3 className="text-4xl font-medium">N&uacute;mero de Personas</h3>
+            <FancyInput label="" placeholder="cantidad de jugadores" type="number" min="1" max="16" maxLength="2" onInput={limitInput} value={numPersonas} 
+              name="num_personas"
+              className={`fancy-input ${errors.num_personas ? 'fancy-input-error' : ''}`}
+              onChange={handleChange} />
+              {errors.num_personas && <p className="error">{errors.num_personas}</p>}
         </div>
-
-        <div className="form-group">
-          <label htmlFor="num_personas">Número de Personas</label>
-          <input 
-            type="number" 
-            name="num_personas" 
-            value={formData.num_personas} 
-            onChange={handleChange} 
-            required 
-            min="1" 
-          />
-        </div>
-
+        <div></div>
+        <div></div>
         <button type="submit" className="btn btn--outline btn--large">
           Guardar
         </button>
+        <button onClick={handleDelete} className="btns btn btn--outline btn--large" style={{ zIndex: 2, position: 'relative' }}>Eliminar</button>
+        <div></div>
+        {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
       </form>
     </div>
+    <ToastContainer />
+    <Footer/>
+  </>
   );
 }
-
-
-// import React, { useState, useEffect } from 'react';
-// import { Button } from '../Button';
-// import '../../App.css';
-// import dayjs from 'dayjs';
-// import "dayjs/locale/es";
-// import { UseFetch } from '../../UseFetch';
-// import { Config } from '../../config';
-// import { ToastContainer, toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-// import WeatherForecast from '../Weatherforecast';
-// import Footer from '../Footer';
-
-// dayjs.locale("es");
-
-// export default function Reserva() {
-
-//   //JSON horarios detalle (reserva)
-//   let url = `${Config.beApiPrefix}/reserva`;
-//   let model = null;
-//   const [action,setAction] = useState('NONE');
-//   console.log(url);
-//   const {dataResponse, loading, error} = UseFetch(url, action, model);
-//   const [events, setEvents] = useState([]);
-//   const handleFetchItems = async () => {
-//     setAction('GET');
-//   }
-
-//   //fetch reserva
-//   useEffect(() => {
-//     console.log('Response Data:', dataResponse);
-//     console.log("CARGANDO?");
-//     console.log('Loading:', loading);
-//     console.log("QUE ERROR DEVUELVE USEFETCH?");
-//     console.log(error);
-
-//     if (loading) {
-//       toast.info('Loading...', {autoClose: 500,});
-//     }
-//     else
-//     {
-//       if (error) {
-//         toast.error(`${eventError}: ${error}`, {autoClose: 2000,});
-//       }
-//       else
-//       {
-//         if (dataResponse) {
-//           toast.success(`${eventOk}`, {autoClose: 1500,});
-//           console.log("tengo datos!!")
-//           console.log(dataResponse);
-//           //handleDataFetched(dataResponse); mostar reserva en pantalla
-//         }
-//       }
-//     }
-//   }, [dataResponse,loading, error]);
-
-//    //mensajes
-//    const eventOk = "Reserva creada exitosamente";
-//    const eventUpd = "Reserva actualizada exitosament";
-//    const incompleteFieldsError = "Por favor, complete todos los campos obligatorios.";
-//    const mandatoryFieldMsg = "Este campo es obligatorio";
-//    const eventError = "Se produjo un error";
-
-//   // Ejemplo de dato seleccionado a mostrar
-//   const jsonData = {
-//     start:"2024-08-30T19:45:00",
-//     end: "2024-08-30T20:45:00",
-//     id: 1,
-//     title: "Prueba eventos",
-//     hours: -3
-//   };
-
-//   // State to hold the calculated datetime
-//   const [datetime, setDatetime] = useState('');
-//   // Function to add hours to a datetime string
-//   const addHours = (start, hours) => {
-//     const date = new Date(start);
-//     date.setHours(date.getHours() + hours);
-//     return date.toISOString().slice(0, 16); // format as "YYYY-MM-DDTHH:MM"
-//   };
-//   useEffect(() => {
-//     // Calculate the new datetime by adding the hours
-//     const calculatedDateTime = addHours(jsonData.start, jsonData.hours);
-//     setDatetime(calculatedDateTime);
-//   }, [jsonData.start, jsonData.hours]);
-
-//   return (
-//   <>
-//   <div className='hero-container'>
-//       <h2 className='sign-up'>RESERVA</h2>
-//       <div className='hero-container'>
-//         <div className="app-container">
-//           <WeatherForecast/>
-//         </div>
-//       </div>
-//        <input
-//         type="datetime-local"
-//         value={datetime}
-//         onChange={(e) => setDatetime(e.target.value)}
-//        />
-//         <div className='hero-btns'>
-//           <Button
-//             className='btns'
-//             buttonStyle='btn--outline'
-//             buttonSize='btn--large'
-//             linkTo='/acreditarme'
-//           >
-//             Guardar <i className='fa fas fa-save' />
-//           </Button>
-//           <Button
-//             className='btns'
-//             buttonStyle='btn--outline'
-//             buttonSize='btn--large'
-//             linkTo='/limpiar'
-//           >
-//             Limpiar <i className='fa fas fa-refresh' />
-//           </Button>
-//         </div>
-//     </div>
-//     <ToastContainer />
-//     <Footer/>
-//     </>
-// );
-// }
