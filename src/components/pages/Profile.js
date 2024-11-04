@@ -124,21 +124,21 @@ export default function Profile() {
   const handleDelete = (e) => {
     e.preventDefault();
     confirmAlert({
-      title: 'Confirmar eliminacion',
-      message: '¿Seguro que quiere eliminar su perfil?',
+      title: 'Confirmar eliminaci\u00F3n',
+      message: '\u00BFSeguro que quiere eliminar su perfil?',
       buttons: [
         {
           label: 'Yes',
           onClick: async () => {
             setUrl(`${Config.boApiPrefix}/usuarios/${formData.id}`);
             setAction('DELETE');
-            toast.success('Perfil eliminado correctamente!');
+            toast.success('\u00BFPerfil eliminado correctamente!');
             setTimeout(() => navigate('/', { replace: true }), 1500);
           }
         },
         {
           label: 'No',
-          onClick: () => toast.info('Eliminación cancelada.')
+          onClick: () => toast.info('Eliminaci\u00F3n cancelada.')
         }
       ]
     });
