@@ -414,7 +414,7 @@ export default function Profile() {
                     onChange={handleChange} />
                     {errors.idTipoUsuario && <p className="error">{errors.idTipoUsuario}</p>}
               </div>
-              <button onClick={handleSubmit} className="btns btn btn--outline btn--large">Enviar</button>
+              <button onClick={handleSubmit} className="btns btn btn--outline btn--large">Guardar</button>
               <button onClick={handleDelete} className="btns btn btn--outline btn--large" style={{ zIndex: 2, position: 'relative' }}>Eliminar</button>
               {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
       </form>
