@@ -7,8 +7,8 @@
 
 h1 {
   color: #333;
-  font-family: 'Arial', sans-serif;
-  margin-bottom: 20px;
+  font-family: 'Roboto', sans-serif;
+  /*margin-bottom: 20px;*/
 }
 
 .controls-container {
@@ -17,6 +17,12 @@ h1 {
   justify-content: center;
   width: 100%;
   max-width: 800px;
+}
+
+/* Invisible spacer that only affects spacing in row layout */
+.invisible-spacer {
+  flex-grow: 1; /* Takes up remaining space */
+  padding-top: 30px;
 }
 
 .date-list {
@@ -79,4 +85,8 @@ input[type="datetime-local"] {
     margin-top: 20px;
     justify-content: center;
   }
+}
+
+.rbc-row {
+  background-color: teal !important;
 }

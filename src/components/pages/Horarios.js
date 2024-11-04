@@ -13,6 +13,7 @@ import WeatherForecast from '../Weatherforecast';
 import Footer from '../Footer';
 import { handleError } from '../HandlerError';
 import { useNavigate } from 'react-router-dom';
+import './Horarios.css';
 
 dayjs.locale("es");
 
@@ -135,6 +136,7 @@ export default function Horarios() {
       <div className='hero-container'>
           <div className="app-container">
           <WeatherForecast/>
+          <div className='invisible-spacer'></div>
           <Calendar 
           onSelectEvent={handleSelectEvent}
           localizer={localizer}
