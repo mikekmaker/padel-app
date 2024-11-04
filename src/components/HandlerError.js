@@ -7,6 +7,10 @@
   export const handleServerError = (error, statusCode) => {
     let errorDetail;
     switch (statusCode) {
+      case 200:
+      case 201:
+          errorDetail =  '';
+          break
       case 400:
           errorDetail = `Error de validaci\u00F3n, solicitud incorrecta: ${error}`;
           break;
@@ -27,12 +31,12 @@
           break;
       case 422:
           console.error('Error de validaci\u00F3n de datos', error);
-          errorDetail =  'Ocurri\u00F3 un error de validaci\u00F3n de datos.';
+          errorDetail =  `Ocurri\u00F3 un error de validaci\u00F3n de datos: ${error}`;
           break;
       default:
-          console.log("Error no manejable de respuesta del server:");
-          console.error('Error status:', statusCode);
-          errorDetail =  `Ocurri\u00F3 un error: ${error}`;
+          console.log("Respuesta del server no manejable:");
+          console.error('status:', statusCode);
+          errorDetail =  `Ocurri\u00F3 una respuesta inesperada: ${error}`;
     }
     return errorDetail;
   }
