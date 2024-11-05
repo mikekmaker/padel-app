@@ -13,10 +13,13 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import { confirmAlert } from 'react-confirm-alert';
 
 export default function ReservaForm() {
+
   //redirect
   const navigate = useNavigate();
   // Capturo horario_id y reserva_id de la URL
   const { idHorario, reservaId } = useParams(); 
+  // Capturo idUsuario logueado
+  const [idUsuario, setIdUsuario] = useState();
   //inicializo variables para manejo de solicitudes
   const [action,setAction] = useState('NONE');
   const [url, setUrl] = useState('');
@@ -37,7 +40,7 @@ export default function ReservaForm() {
   const [formData, setFormData] = useState({
     reserva_id: reservaId || '', 
     cancha_id: '',
-    usuario_id: '1', 
+    usuario_id: '', 
     horario_id: idHorario || '', 
     fecha: '',
     hora: '',
@@ -84,6 +87,7 @@ export default function ReservaForm() {
 
   // Fetch horario reserva en el evento load
   useEffect(() => {
+      setIdUsuario(localStorage.getItem('usuarioId'));
       fetchHorarioReserva(idHorario);
   }, [idHorario,fetchHorarioReserva]);
 
@@ -93,7 +97,7 @@ export default function ReservaForm() {
       const formattedData = {
         reserva_id: dataResponse[0].reserva?.reserva_id || reservaId || '', 
         cancha_id: dataResponse[0].reserva?.cancha?.cancha_id || '', 
-        usuario_id: dataResponse[0].reserva?.usuario_id || '1',
+        usuario_id: dataResponse[0].reserva?.usuario?.usuario_id || idUsuario || '',
         horario_id: dataResponse[0].horario_id || idHorario || '', 
         fecha: dataResponse[0].fecha || '',
         hora: dataResponse[0].hora || '',
