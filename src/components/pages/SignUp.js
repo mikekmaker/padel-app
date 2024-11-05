@@ -8,8 +8,12 @@ import { UseFetch } from '../../UseFetch';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Footer from '../Footer';
+import { useNavigate } from 'react-router-dom';
 
 export default function SignUp() {
+
+  //redirect
+  const navigate = useNavigate();
 
   //formulario para el modelo
   const [formData, setFormData] = useState({
@@ -131,6 +135,9 @@ export default function SignUp() {
       else{
         if (dataResponse) {
         toast.success(`${eventOk}`, {autoClose: 1500,});
+        setTimeout(() => {
+          navigate('/voy', { replace: true });
+          }, 1500);
         }
       }
     }
