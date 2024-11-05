@@ -27,22 +27,18 @@ export default function SignUp() {
     telefono: '',
     nivel: '',
     tipoDeJuego:'',
-    fotoPerfil: '',
     idTipoUsuario: 3
   });
 
   //envio de datos
   const [model,setModel] = useState(null);
   const [action,setAction] = useState('NONE');
-  let url = `${Config.boApiPrefix}/usuarios`;
+  let url = `${Config.boApiPrefix}/usuario`;
   console.log(url);
   const {dataResponse, statusCode, loading, error} = UseFetch(url, action, model);
 
-  //manejo de imagenes
-  const [photoBase64, setPhotoBase64] = useState('');
-  const [imageSrc, setImageSrc] = useState('');
+  //manejo de campos
   const [edad, setEdad] = useState('');
-  const imageType = 'png';
 
   //inicializar opciones de controles
   const optionsNivel = [
@@ -110,43 +106,11 @@ export default function SignUp() {
         data.append('direccion', formData.direccion);
         data.append('recontrasena',formData.recontrasena);
         data.append('remail',formData.remail);
-
-        if (formData.fotoPerfil) {
-             data.append('fotoPerfil', photoBase64);
-        }
+        data.append('fotoPerfil',"foto.jpg");
         setModel(data);
         setAction('POST');
       }
   };
-
-  //manejador de cambios de foto
-  const handlePhotoChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: '' });
-    const file = e.target.files[0];
-
-    if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setPhotoBase64(reader.result);
-        };
-        reader.readAsDataURL(file);
-        console.log("cargado")
-    }
-    else
-    {
-      setPhotoBase64('')
-      console.log("vaciado")
-    }
-  };
-
-  //actualizacion de foto en layout
-  useEffect(() => {
-    if (photoBase64) {
-      setImageSrc(photoBase64);
-    }
-  }, [photoBase64, imageType]);
 
   //actualizacion de mensajes en layout
   useEffect(() => {
@@ -270,6 +234,7 @@ export default function SignUp() {
                     onChange={handleChange} />
                     {errors.direccion && <p className="error">{errors.direccion}</p>}
               </div>
+              <div></div>
               <div>
                   <h3 className="text-4xl font-medium">Email</h3>
                   <FancyInput label="" placeholder="Ingrese su email" type="email" value={formData.email}
@@ -325,26 +290,13 @@ export default function SignUp() {
                     {errors.tipoDeJuego && <p className="error">{errors.tipoDeJuego}</p>}
               </div>
               <div>
-                <h3 className="text-4xl font-medium">Vista previa de la imagen</h3>
-                <div className="image-preview">
-                  {imageSrc && <img src={imageSrc} alt="Preview" style={{maxWidth: '100%', height: 'auto'}} />}
-                </div>
-              </div>
-              <div>
-                <h3 className="text-4xl font-medium">Foto de perfil</h3>
-                <FancyInput placeholder="Suba su foto" type="file" value={formData.fotoPerfil}
-                  name="fotoPerfil"
-                  className={`fancy-input ${errors.fotoPerfil ? 'fancy-input-error' : ''}`}
-                  onChange={handlePhotoChange} />
-                  {errors.fotoPerfil && <p className="error">{errors.fotoPerfil}</p>}
-              </div>
-              <div>
                   <FancyInput label="" placeholder="" type="hidden" value={formData.idTipoUsuario}
                     name="idTipoUsuario"
                     className={`fancy-input ${errors.idTipoUsuario ? 'fancy-input-error' : ''}`}
                     onChange={handleChange} />
                     {errors.idTipoUsuario && <p className="error">{errors.idTipoUsuario}</p>}
               </div>
+              <div></div>
               <button onClick={handleSubmit}  className="btns btn btn--outline btn--large">Enviar</button>
               {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
       </form>
