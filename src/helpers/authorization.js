@@ -11,7 +11,7 @@ export const isAuthenticated = async () => {
     try {
         // Send the token to the server for validation
         const response = await axios.post(
-            `${Config.boApiPrefix}/me`, // Correct endpoint
+            `${Config.boApiPrefix}/validarToken`, // Correct endpoint
             JSON.stringify({ idTipoUsuario }), // Send idTipoUsuario in request body
             {
               headers: {
