@@ -96,7 +96,7 @@ export default function Profile() {
   //funcion para traer mis datos
   const getMe = async (idUsuario) => {
     console.log("1) enviando peticion de datos personal al server...")
-    let url = `${Config.boApiPrefix}/usuarios`;
+    let url = `${Config.boApiPrefix}/usuario`;
     setUrl(`${url}/${idUsuario}`);
     setAction('GET');
   }
@@ -130,7 +130,7 @@ export default function Profile() {
         {
           label: 'Yes',
           onClick: async () => {
-            setUrl(`${Config.boApiPrefix}/usuarios/${formData.id}`);
+            setUrl(`${Config.boApiPrefix}/usuario/${formData.id}`);
             setAction('DELETE');
             toast.success('\u00BFPerfil eliminado correctamente!');
             setTimeout(() => navigate('/', { replace: true }), 1500);
@@ -339,6 +339,7 @@ export default function Profile() {
                     onChange={handleChange} />
                     {errors.direccion && <p className="error">{errors.direccion}</p>}
               </div>
+              <div></div>
               <div>
                   <h3 className="text-4xl font-medium">Email</h3>
                   <FancyInput label="" placeholder="Ingrese su email" type="email" value={formData.email}
@@ -393,20 +394,7 @@ export default function Profile() {
                   </select>
                     {errors.tipoDeJuego && <p className="error">{errors.tipoDeJuego}</p>}
               </div>
-              <div>
-                <h3 className="text-4xl font-medium">Vista previa de la imagen</h3>
-                <div className="image-preview">
-                  {imageSrc && <img src={imageSrc} alt="Preview" style={{maxWidth: '100%', height: 'auto'}} />}
-                </div>
-              </div>
-              <div>
-                <h3 className="text-4xl font-medium">Foto de perfil</h3>
-                <FancyInput placeholder="Suba su foto" type="file" value={formData.editFotoPerfil}
-                  name="editFotoPerfil"
-                  className={`fancy-input ${errors.editFotoPerfil ? 'fancy-input-error' : ''}`}
-                  onChange={handlePhotoChange} />
-                  {errors.editFotoPerfil && <p className="error">{errors.editFotoPerfil}</p>}
-              </div>
+              <div></div>
               <div>
                   <FancyInput label="" placeholder="" type="hidden" value={formData.idTipoUsuario}
                     name="idTipoUsuario"
