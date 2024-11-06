@@ -26,7 +26,7 @@ export function UseFetch(url, action, body = null) {
           case 'GET':
             response = await axios.get(url, {
               headers: {
-              //'ngrok-skip-browser-warning': 'ngrok-skip-browser-warning',
+              'ngrok-skip-browser-warning': 'ngrok-skip-browser-warning',
               'Content-Type': 'application/json',
               'accept':'application/json'
               }
@@ -43,7 +43,8 @@ export function UseFetch(url, action, body = null) {
                     response = await axios.post(url, body, {
                         headers: {
                         'Content-Type': 'application/json',
-                        'accept':'application/json'
+                        'accept':'application/json',
+                        'ngrok-skip-browser-warning': 'ngrok-skip-browser-warning',
                         }
                     }
                     );
