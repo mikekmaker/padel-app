@@ -26,6 +26,7 @@ export default function ReservaForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isloading, setLoading] = useState(true);
   const [descripcionHorario,setDescripcionHorario]= useState('');
+  const [isReadOnly, setIsReadOnly] = useState(false);
 
   //inicialización de lista para validación de datos de formulario
   const [errors, setErrors] = useState({});
@@ -109,6 +110,17 @@ export default function ReservaForm() {
       console.log(formattedData);
       setFormData(formattedData);
       //formatear horario
+      console.log('USUARIO local: %d',idUsuario);
+      console.log('USUARIO reserva: %d',formattedData.usuario_id);
+      const u1 = parseInt(idUsuario, 10);
+      const u2 = parseInt(formattedData.usuario_id, 10);
+      if (u1 !== u2) {
+        setIsReadOnly(true);
+        console.log("no puede editar");
+      }else{
+        console.log("ahora si puede editar");
+        setIsReadOnly(false);
+      }
       setLoading(false);
     }
     if (error) {
@@ -119,9 +131,11 @@ export default function ReservaForm() {
 
   // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value || '',}));
-    setErrors({ ...errors, [name]: '' });             
+    if (!isReadOnly) {
+      const { name, value } = e.target;
+      setFormData((prevData) => ({ ...prevData, [name]: value || '',}));
+      setErrors({ ...errors, [name]: '' });  
+    }           
   };
 
   // UseFetch hook para hacer llamadas a APIs
@@ -252,7 +266,7 @@ export default function ReservaForm() {
             <FancyInput label="" placeholder="Descripcion" type="text" value={formData.descripcion}
               name="descripcion"
               className={`fancy-input ${errors.descripcion ? 'fancy-input-error' : ''}`}
-              onChange={handleChange} />
+              onChange={handleChange} readOnly={isReadOnly} />
               {errors.descripcion && <p className="error">{errors.descripcion}</p>}
         </div>
         <div></div>
@@ -277,15 +291,15 @@ export default function ReservaForm() {
             <FancyInput label="" placeholder="cantidad de jugadores" type="number" min="1" max="16" maxLength="2" onInput={limitInput} value={numPersonas} 
               name="num_personas"
               className={`fancy-input ${errors.num_personas ? 'fancy-input-error' : ''}`}
-              onChange={handleChange} />
+              onChange={handleChange} readOnly={isReadOnly} />
               {errors.num_personas && <p className="error">{errors.num_personas}</p>}
         </div>
         <div></div>
         <div></div>
-        <button type="submit" className="btn btn--outline btn--large">
+        <button type="submit" className="btn btn--outline btn--large" disabled={isReadOnly}>
           Guardar
         </button>
-        <button onClick={handleDelete} className="btns btn btn--outline btn--large" style={{ zIndex: 2, position: 'relative' }}>Eliminar</button>
+        <button onClick={handleDelete} className="btns btn btn--outline btn--large" disabled={isReadOnly} style={{ zIndex: 2, position: 'relative' }}>Eliminar</button>
         <div></div>
         {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
       </form>
