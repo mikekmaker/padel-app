@@ -95,6 +95,8 @@ export default function Profile() {
     
   //funcion para traer mis datos
   const getMe = async (idUsuario) => {
+    console.log("mi id:");
+    console.log(idUsuario);
     console.log("1) enviando peticion de datos personal al server...")
     let url = `${Config.boApiPrefix}/usuario`;
     setUrl(`${url}/${idUsuario}`);
@@ -103,6 +105,8 @@ export default function Profile() {
 
   useEffect(() => {
     if (dataResponse) {
+      console.log("RECIBO MIS DATOS");
+      console.log(dataResponse);
       setFormData(dataResponse);
       setNombreCompleto(`${dataResponse.nombre} ${dataResponse.apellido}`);
       setLoading(false);
