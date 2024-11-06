@@ -14,6 +14,8 @@ import Footer from '../Footer';
 import { handleError } from '../HandlerError';
 import { useNavigate } from 'react-router-dom';
 import './Horarios.css';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { confirmAlert } from 'react-confirm-alert';
 
 dayjs.locale("es");
 
@@ -84,12 +86,27 @@ export default function Horarios() {
   //redirect
   const navigate = useNavigate();
   const handleSelectEvent = (event) => {
-    let exist = event.resource? event.resource.reserva_id : null;
-    if (exist) {
-      navigate(`/Horarios/${event.id}/Reserva/${exist}`);
+    const usuarioId = localStorage.getItem('usuarioId');
+    if (!usuarioId) {
+      confirmAlert({
+          title: 'Inicio de sesi\u00F3n requerido',
+          message: 'Debe iniciar sesi\u00F3n para acceder a esta funci\u00F3n.',
+          buttons: [
+              {
+                  label: 'OK',
+                  onClick: () => {}
+              }
+          ]
+      });
     } else {
-      console.log("reserva nueva")
-      navigate(`/Horarios/${event.id}/Reserva`);
+
+      let exist = event.resource? event.resource.reserva_id : null;
+      if (exist) {
+        navigate(`/Horarios/${event.id}/Reserva/${exist}`);
+      } else {
+        console.log("reserva nueva")
+        navigate(`/Horarios/${event.id}/Reserva`);
+      }
     }
   };
 
