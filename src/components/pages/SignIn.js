@@ -95,7 +95,7 @@ export default function SignIn() {
         setFormErrorMessage('');
         // Creacion de objeto FormData para enviar instancia del modelo
         const data = new FormData();
-        data.append('alias', formData.alias);
+        data.append('alias', formData.alias.toLowerCase());
         data.append('contrasena', formData.contrasena);
 
         setModel(data);
