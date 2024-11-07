@@ -88,6 +88,20 @@ export default function SignUp() {
         }
     });
 
+    const { contrasena, recontrasena, email, remail } = formData;
+
+    // Check if passwords match
+    if (contrasena !== recontrasena) {
+      toast.error('Las contrase\u00F1as no coinciden');
+      return;
+    }
+
+    // Check if emails match
+    if (email !== remail) {
+      toast.error('Los correos electr\u00F3nicos no coinciden');
+      return;
+    }
+
     if (Object.keys(newErrors).length > 0) {
         setFormErrorMessage(incompleteFieldsError);
         setErrors(newErrors);

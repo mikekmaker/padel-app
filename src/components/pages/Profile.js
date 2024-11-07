@@ -108,6 +108,7 @@ export default function Profile() {
       console.log("RECIBO MIS DATOS");
       console.log(dataResponse);
       setFormData(dataResponse);
+      setEdad(dataResponse.edad);
       setNombreCompleto(`${dataResponse.nombre} ${dataResponse.apellido}`);
       setLoading(false);
     }
@@ -160,6 +161,20 @@ export default function Profile() {
         }
     });
 
+    const { contrasena, recontrasena, email, remail } = formData;
+
+    // Check if passwords match
+    if (contrasena !== recontrasena) {
+      toast.error('Las contrase\u00F1as no coinciden');
+      return;
+    }
+
+    // Check if emails match
+    if (email !== remail) {
+      toast.error('Los correos electr\u00F3nicos no coinciden');
+      return;
+    }
+
     if (Object.keys(newErrors).length > 0) {
         setFormErrorMessage(incompleteFieldsError);
         setErrors(newErrors);
@@ -171,7 +186,7 @@ export default function Profile() {
         data.append('nivel', formData.nivel);
         data.append('apellido', formData.apellido);
         data.append('edad', formData.edad);
-        data.append('alias', formData.alias);
+        data.append('alias', formData.alias.toLowerCase());
         data.append('contrasena', formData.contrasena);
         data.append('telefono', formData.telefono);
         data.append('idTipoUsuario',formData.idTipoUsuario);
