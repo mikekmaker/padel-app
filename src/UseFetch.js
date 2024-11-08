@@ -77,7 +77,7 @@ export function UseFetch(url, action, body = null) {
       } catch (err) {
         console.log("4) hubo un error:");
         if (err.response) {  // Si el error tiene respuesta con detalle
-          setError(`Error ${err.response.status}: ${err.response.statusText}`);
+          setError(`Error inesperado: ${err.response.statusText}`);
           setStatusCode(err.response.status);  // Guardar código de error
         } else {
           setError(err.message);  // Errores de red u otros
