@@ -11,7 +11,7 @@ export const isAuthenticated = async () => {
     try {
         // Send the token to the server for validation
         const response = await axios.post(
-            `${Config.boApiPrefix}/validarToken`, // Correct endpoint
+            `${Config.boApiPrefix}/me`, // Correct endpoint
             JSON.stringify({ idTipoUsuario }), // Send idTipoUsuario in request body
             {
               headers: {
@@ -23,7 +23,7 @@ export const isAuthenticated = async () => {
         );
     
         // Check the response from the backend
-        if (response.data.isValid) {
+        if (response.data.usuario) {
             return true;
         } else {
             console.warn('Token no es valido:', response.data.message);

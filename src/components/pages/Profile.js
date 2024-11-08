@@ -98,7 +98,7 @@ export default function Profile() {
     console.log("mi id:");
     console.log(idUsuario);
     console.log("1) enviando peticion de datos personal al server...")
-    let url = `${Config.boApiPrefix}/usuario`;
+    let url = `${Config.boApiPrefix}/usuarios`;
     setUrl(`${url}/${idUsuario}`);
     setAction('GET');
   }
@@ -135,7 +135,7 @@ export default function Profile() {
         {
           label: 'Yes',
           onClick: async () => {
-            setUrl(`${Config.boApiPrefix}/usuario/${formData.id}`);
+            setUrl(`${Config.boApiPrefix}/usuarios/${formData.id}`);
             setAction('DELETE');
             toast.success('\u00BFPerfil eliminado correctamente!');
             setTimeout(() => navigate('/', { replace: true }), 1500);

@@ -37,7 +37,7 @@ export default function SignUp() {
   //envio de datos
   const [model,setModel] = useState(null);
   const [action,setAction] = useState('NONE');
-  let url = `${Config.boApiPrefix}/usuario`;
+  let url = `${Config.boApiPrefix}/usuarios`;
   console.log(url);
   const {dataResponse, statusCode, loading, error} = UseFetch(url, action, model);
 
