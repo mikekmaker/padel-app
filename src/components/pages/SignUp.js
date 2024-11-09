@@ -150,7 +150,7 @@ export default function SignUp() {
         if (dataResponse) {
         toast.success(`${eventOk}`, {autoClose: 1500,});
         setTimeout(() => {
-          navigate('/voy', { replace: true });
+          navigate('/', { replace: true });
           }, 1500);
         }
       }
