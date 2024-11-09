@@ -1,37 +1,30 @@
 import { useState,useEffect } from "react";
 import axios from "axios";
 
-export function UseFetch(url, action, body = null) {
+export function UseFetch(url, action, body = null, bearer = null) {
   const [dataResponse, setDataResponse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusCode, setStatusCode] = useState(null);
-  // const getHeaders = {
-  //   "ngrok-skip-browser-warning": "ngrok-skip-browser-warning",
-  //   'Content-Type': 'application/json',
-  //   'accept':'application/json',
-  // };
-
-
+  
   useEffect(() => {
     const fetchData = async () => {
       console.log("3) iniciando solicitud con axios...")
       setLoading(true);
       setError(null);
       try {
+        const headers = {
+          'ngrok-skip-browser-warning': 'ngrok-skip-browser-warning',
+          'Content-Type': 'application/json',
+          'accept': 'application/json',
+          ...(bearer && { 'Authorization': `Bearer ${bearer}` })
+        };
         let response;
         switch (action) {
           case 'NONE': 
             break;
           case 'GET':
-            response = await axios.get(url, {
-              headers: {
-              'ngrok-skip-browser-warning': 'ngrok-skip-browser-warning',
-              'Content-Type': 'application/json',
-              'accept':'application/json'
-              }
-              }
-            );
+            response = await axios.get(url, { headers });
             break;
           case 'POST':
             if (body !== null && body !== undefined) {
@@ -41,11 +34,7 @@ export function UseFetch(url, action, body = null) {
                     }
                     console.log(body);
                     response = await axios.post(url, body, {
-                        headers: {
-                        'Content-Type': 'application/json',
-                        'accept':'application/json',
-                        'ngrok-skip-browser-warning': 'ngrok-skip-browser-warning',
-                        }
+                        headers: headers
                     }
                     );
             }
@@ -57,16 +46,11 @@ export function UseFetch(url, action, body = null) {
                 console.log(`${pair[0]}: ${pair[1]}`);
               }
               console.log(body);
-              response = await axios.put(url, body, {
-                headers: {
-                'Content-Type': 'application/json',
-                'accept':'application/json'
-                }
-            });
+              response = await axios.put(url, body, { headers });
             }
             break;
           case 'DELETE':
-            response = await axios.delete(url);
+            response = await axios.delete(url,{ headers });
             break;
           default:
             throw new Error('Invalid action');
@@ -91,7 +75,7 @@ export function UseFetch(url, action, body = null) {
         console.log("2) enviando solicitud asincr\u00F3nica...");
         fetchData();
     }
-  }, [url, action, body]);
+  }, [url, action, body, bearer]);
 
   return { dataResponse, statusCode, loading, error };
 }
