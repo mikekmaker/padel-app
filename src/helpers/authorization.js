@@ -23,7 +23,7 @@ export const isAuthenticated = async () => {
         );
     
         // Check the response from the backend
-        if (response.data.usuario) {
+        if (response.data.usuario) { 
             return true;
         } else {
             console.warn('Token no es valido:', response.data.message);
