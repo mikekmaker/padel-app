@@ -40,9 +40,9 @@ export default function Profile() {
   const [model,setModel] = useState(null);
   const [action,setAction] = useState('NONE');
   const [url, setUrl] = useState('');
-
+  const [bearer,setBearer] = useState(null);
   // Obtener datos del usuario usando UseFetch
-  const { dataResponse, statusCode, loading: isLoading, error } = UseFetch(url,action,model);    
+  const { dataResponse, statusCode, loading: isLoading, error } = UseFetch(url,action,model,bearer);    
 
   //datos de sesión
   const [nombreCompleto, setNombreCompleto] = useState('');
@@ -70,13 +70,14 @@ export default function Profile() {
   // Obtener ID del usuario desde localStorage y generar la URL
   useEffect(() => {
     const idUsuario = localStorage.getItem('usuarioId');
+    setBearer(localStorage.getItem('authToken'));
     if (loading || isLoading) {
       toast.info('Loading...', {autoClose: 500,});
     }
     if (idUsuario) {
       getMe(idUsuario);
     } else {
-        toast.error('Sesión Agotada....');
+        toast.error('Sesi\u00F3n Agotada....');
         setTimeout(() => {
         navigate('/voy', { replace: true });
         }, 1500);
