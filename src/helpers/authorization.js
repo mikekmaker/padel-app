@@ -1,5 +1,5 @@
-import axios from "axios";
-import { Config } from "../config";
+//import axios from "axios";
+//import { Config } from "../config";
 
 export const isAuthenticated = async () => {
     const token = localStorage.getItem('authToken');
