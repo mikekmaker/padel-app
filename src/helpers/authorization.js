@@ -8,34 +8,34 @@ export const isAuthenticated = async () => {
     console.log("idTipoUsuario:", idTipoUsuario);
     if (!token || !idTipoUsuario) return false;
   
-    try {
+    //try {
         // Send the token to the server for validation
-        const response = await axios.post(
-            `${Config.boApiPrefix}/me`, // Correct endpoint
-            JSON.stringify({ idTipoUsuario }), // Send idTipoUsuario in request body
-            {
-              headers: {
-                'Authorization': `Bearer ${token}`, // Correct header with Bearer token
-                'Content-Type': 'application/json',
-                'accept':'application/json'
-              },
-            }
-        );
+        // const response = await axios.post(
+        //     `${Config.boApiPrefix}/me`, // Correct endpoint
+        //     JSON.stringify({ idTipoUsuario }), // Send idTipoUsuario in request body
+        //     {
+        //       headers: {
+        //         'Authorization': `Bearer ${token}`, // Correct header with Bearer token
+        //         'Content-Type': 'application/json',
+        //         'accept':'application/json'
+        //       },
+        //     }
+        // );
     
         // Check the response from the backend
-        if (response.data.usuario) { 
+        //if (response.data.usuario) { 
             return true;
-        } else {
-            console.warn('Token no es valido:', response.data.message);
-            localStorage.clear(); // Clear storage if token/role is invalid
-            return false;
-        }
+        //} else {
+        //    console.warn('Token no es valido:', response.data.message);
+        //    localStorage.clear(); // Clear storage if token/role is invalid
+        //    return false;
+        //}
 
-    } catch (error) {
-        console.error('Falla inesperada al validar Token:', error);
-        localStorage.clear();  // Clear localStorage if validation fails
-    return false;
-    }
+    // } catch (error) {
+    //     console.error('Falla inesperada al validar Token:', error);
+    //     localStorage.clear();  // Clear localStorage if validation fails
+    // return false;
+    // }
   };
   
 export const logout = () => {
