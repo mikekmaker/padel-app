@@ -18,12 +18,6 @@ const ProtectedRoute = () => {
 
     // Redirect to login if not authenticated, otherwise render the protected component
     return isAuth ? <Outlet /> : <Navigate to="/voy" replace />;
-    
-    //   if (!isAuthenticated()) {
-    //     toast.error('Acceso No Autorizado. Redireccionando a pantalla de ingreso...', { autoClose: 2000 });
-    //     return <Navigate to="/voy" replace />;
-    //   }
-    //  return children ? children : <Outlet />;
 };
 
 export default ProtectedRoute;
