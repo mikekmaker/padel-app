@@ -11,7 +11,7 @@ import Footer from '../Footer';
 import { useNavigate } from 'react-router-dom';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { confirmAlert } from 'react-confirm-alert';
-
+import { logout } from '../../helpers/authorization';
 export default function Profile() {
   //redirect
   const navigate = useNavigate();
@@ -41,8 +41,6 @@ export default function Profile() {
   const [action,setAction] = useState('NONE');
   const [url, setUrl] = useState('');
   const [bearer,setBearer] = useState(null);
-  // Obtener datos del usuario usando UseFetch
-  const { dataResponse, statusCode, loading: isLoading, error } = UseFetch(url,action,model,bearer);    
 
   //datos de sesión
   const [nombreCompleto, setNombreCompleto] = useState('');
@@ -65,24 +63,48 @@ export default function Profile() {
     { value: 'drive', label: 'Drive' },
     { value: 'indistinto', label: 'Indistinto' }
   ];
-  //fin inicializar controles									 
+  //fin inicializar controles	
+
+   // Obtener datos del usuario usando UseFetch
+   const { dataResponse, statusCode, loading: isLoading, error } = UseFetch(url,action,model,bearer);    
+  
+   //funcion para traer mis datos
+   const getMe = async (idUsuario, idTipoUsuario, bearer,loading) => {
+    if(!loading){
+      console.log(idUsuario);
+      console.log(idTipoUsuario);
+      console.log(bearer);
+      console.log("1) armando peticion GETME() al server...")
+      let baseUrl = `${Config.boApiPrefix}`;
+      console.log(baseUrl);
+      //setUrl(`${url}/usuarios/${idUsuario}`);
+      setBearer(bearer);
+      const data = new FormData();
+      data.append('idTipoUsuario', idTipoUsuario);
+      setModel(data);
+      setUrl(`${baseUrl}/me`)
+      console.log("solicitud a:", `${baseUrl}/me`);
+      setAction('POST');
+    }
+  }
     
   // Obtener ID del usuario desde localStorage y generar la URL
   useEffect(() => {
     const idUsuario = localStorage.getItem('usuarioId');
-    setBearer(localStorage.getItem('authToken'));
-    if (loading || isLoading) {
+    const idTipoUsuario = localStorage.getItem('idTipoUsuario');
+    let b = localStorage.getItem('authToken');
+    if (loading) {
       toast.info('Loading...', {autoClose: 500,});
     }
     if (idUsuario) {
-      getMe(idUsuario);
+      getMe(idUsuario,idTipoUsuario,b,loading);
     } else {
         toast.error('Sesi\u00F3n Agotada....');
         setTimeout(() => {
         navigate('/voy', { replace: true });
         }, 1500);
     }
-  }, [navigate,loading,isLoading]);
+  }, [navigate,loading]);
 
   //mensajes
   const eventOk = "Perfil actualizado correctamente!";
@@ -93,30 +115,21 @@ export default function Profile() {
   //inicialización de lista para validación de datos de formulario
   const [errors, setErrors] = useState({});
   const [formErrorMessage, setFormErrorMessage] = useState('');
-    
-  //funcion para traer mis datos
-  const getMe = async (idUsuario) => {
-    console.log("mi id:");
-    console.log(idUsuario);
-    console.log("1) enviando peticion de datos personal al server...")
-    let url = `${Config.boApiPrefix}/usuarios`;
-    setUrl(`${url}/${idUsuario}`);
-    setAction('GET');
-  }
 
   useEffect(() => {
-    if (dataResponse) {
+    if (dataResponse?.usuario) {
       console.log("RECIBO MIS DATOS");
-      console.log(dataResponse);
-      setFormData(dataResponse);
-      setEdad(dataResponse.edad);
-      setNombreCompleto(`${dataResponse.nombre} ${dataResponse.apellido}`);
+      console.log(dataResponse.usuario);
+      setFormData(dataResponse.usuario);
+      setEdad(dataResponse.usuario.edad);
+      setNombreCompleto(`${dataResponse.usuario.nombre} ${dataResponse.usuario.apellido}`);
       setLoading(false);
     }
     if (error) {
       handleError(error,statusCode);
       setLoading(false);
     }
+    setLoading(false);
   }, [dataResponse, statusCode, loading, error]);
   
   // Manejar cambios en los campos del formulario
@@ -139,6 +152,7 @@ export default function Profile() {
             setUrl(`${Config.boApiPrefix}/usuarios/${formData.id}`);
             setAction('DELETE');
             toast.success('\u00BFPerfil eliminado correctamente!');
+            logout();
             setTimeout(() => navigate('/', { replace: true }), 1500);
           }
         },
@@ -162,7 +176,7 @@ export default function Profile() {
         }
     });
 
-    const { contrasena, recontrasena, email, remail } = formData;
+    const { contrasena, recontrasena, email, remail, id } = formData;
 
     // Check if passwords match
     if (contrasena !== recontrasena) {
@@ -204,6 +218,8 @@ export default function Profile() {
         }
 
         setModel(data);
+        let baseUrl = `${Config.boApiPrefix}`;
+        setUrl(`${baseUrl}/usuarios/${id}`);
         setAction('PUT');
       }
   };
