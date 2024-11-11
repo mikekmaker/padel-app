@@ -6,7 +6,10 @@ export function UseFetch(url, action, body = null, bearer = null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusCode, setStatusCode] = useState(null);
-  
+  console.log("usefetch endpoint destino", url);
+  console.log("usefetch bearer", bearer);
+  console.log("usefetch body", body);
+  console.log("usefetch action", action);
   useEffect(() => {
     const fetchData = async () => {
       console.log("3) iniciando solicitud con axios...")
@@ -19,6 +22,9 @@ export function UseFetch(url, action, body = null, bearer = null) {
           'accept': 'application/json',
           ...(bearer && { 'Authorization': `Bearer ${bearer}` })
         };
+        const requestBody = (body && typeof body === "object" && !(body instanceof FormData))
+          ? JSON.stringify(body)
+          : body;
         let response;
         switch (action) {
           case 'NONE': 
@@ -33,7 +39,7 @@ export function UseFetch(url, action, body = null, bearer = null) {
                       console.log(`${pair[0]}: ${pair[1]}`);
                     }
                     console.log(body);
-                    response = await axios.post(url, body, {
+                    response = await axios.post(url, requestBody, {
                         headers: headers
                     }
                     );
@@ -46,7 +52,7 @@ export function UseFetch(url, action, body = null, bearer = null) {
                 console.log(`${pair[0]}: ${pair[1]}`);
               }
               console.log(body);
-              response = await axios.put(url, body, { headers });
+              response = await axios.put(url, requestBody, { headers });
             }
             break;
           case 'DELETE':
