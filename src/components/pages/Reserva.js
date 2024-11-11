@@ -78,19 +78,28 @@ export default function ReservaForm() {
   const fetchHorarioReserva = useCallback((id) => {
     if(id){
       console.log("1) armando peticion para enviar al server...")
-      let urlh = `${Config.beApiPrefix}/horariosreservas`;
-      let filter = `horario_id=${idHorario}`;
-      console.log(`${urlh}?${filter}`);
-      setUrl(`${urlh}?${filter}`);
+      let urlh;
+      if(reservaId === undefined)
+      {
+        urlh = `${Config.beApiPrefix}/horariosreservas/${idHorario}`;
+      }
+      else
+      {
+          urlh = `${Config.beApiPrefix}/horariosreservas/${idHorario}/reserva/${reservaId}`;
+      }
+      //let filter = `horario_id=${idHorario}`;
+      //console.log(`${urlh}?${filter}`);
+      //setUrl(`${urlh}?${filter}`);
+      setUrl(urlh);
       setAction('GET');
     }
-  },[idHorario]);
+  },[idHorario,reservaId]);
 
   // Fetch horario reserva en el evento load
   useEffect(() => {
       setIdUsuario(localStorage.getItem('usuarioId'));
       fetchHorarioReserva(idHorario);
-  }, [idHorario,fetchHorarioReserva]);
+  }, [idHorario,reservaId,fetchHorarioReserva]);
 
   useEffect(() => {
     if (dataResponse && isloading) {
@@ -127,7 +136,7 @@ export default function ReservaForm() {
       handleError(error,statusCode);
       setLoading(false);
     }
-  }, [dataResponse, statusCode, isloading, error,idHorario,reservaId]);
+  }, [dataResponse, statusCode, isloading, error,idHorario,reservaId,idUsuario]);
 
   // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
@@ -150,7 +159,7 @@ export default function ReservaForm() {
     data.append('descripcion', formData.descripcion);
     data.append('num_personas', formData.num_personas);
     setFormData(data);
-    let target = action === 'POST' ? "reserva" : `reserva\\${formData.reserva_id}`
+    let target = action === 'POST' ? "reservas" : `reservas\\${formData.reserva_id}`
     console.log("destino");
     console.log(target);
     setUrl(`${Config.beApiPrefix}/${target}`);
@@ -179,7 +188,7 @@ export default function ReservaForm() {
         {
           label: 'Yes',
           onClick: async () => {
-            setUrl(`${Config.beApiPrefix}/reserva/${formData.reserva_id}`);
+            setUrl(`${Config.beApiPrefix}/reservas/${formData.reserva_id}`);
             setAction('DELETE');
             toast.success('\u00A1Reserva eliminada correctamente!');
             setTimeout(() => navigate('/horarios', { replace: true }), 1500);
