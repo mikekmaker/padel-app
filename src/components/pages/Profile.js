@@ -271,7 +271,7 @@ export default function Profile() {
         toast.error(`${eventError}: ${handleError(error, statusCode)}`, {autoClose: 2000,});
       }
       else{
-        if (dataResponse) {
+        if (dataResponse && !(error) && (statusCode === 200 || statusCode === 201)) {
           toast.success(`${eventOk}`, {autoClose: 1500,});
         }
       }
