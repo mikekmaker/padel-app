@@ -113,7 +113,7 @@ export default function SignUp() {
         data.append('nivel', formData.nivel);
         data.append('apellido', formData.apellido);
         data.append('edad', formData.edad);
-        data.append('alias', formData.alias);
+        data.append('alias', formData.alias.toLowerCase());
         data.append('contrasena', formData.contrasena);
         data.append('telefono', formData.telefono);
         data.append('idTipoUsuario',formData.idTipoUsuario);
