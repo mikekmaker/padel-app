@@ -84,7 +84,7 @@ export default function Profile() {
       setModel(data);
       setUrl(`${baseUrl}/me`)
       console.log("solicitud a:", `${baseUrl}/me`);
-      setAction('POST');
+      setAction('GET');
     }
   }
     
