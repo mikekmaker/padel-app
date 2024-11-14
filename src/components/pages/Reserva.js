@@ -308,20 +308,16 @@ export default function ReservaForm() {
               {errors.num_personas && <p className="error">{errors.num_personas}</p>}
         </div>
         <div></div>
-        <div></div>
         {!isReadOnly && (
                 <button type="submit" className="btn btn--outline btn--large">
                   Guardar
                 </button>
         )}
-        {!isReadOnly && (
+        {!isReadOnly && formData.reserva_id != '' && (
            <button onClick={handleDelete} className="btns btn btn--outline btn--large" style={{ zIndex: 2, position: 'relative' }}>Eliminar</button>
         )}
-        {isReadOnly && (
-           <button onClick={handleGoBack} className="btns btn btn--outline btn--large" style={{ zIndex: 2, position: 'relative' }}>Volver</button>
-        )
-
-        }
+        
+        <button onClick={handleGoBack} className="btns btn btn--outline btn--large" style={{ zIndex: 3, position: 'relative' }}>Volver</button>
        <div></div>
         {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
       </form>
