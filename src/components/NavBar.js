@@ -68,7 +68,7 @@ function Navbar() {
                 Horarios
               </Link>
             </li>
-            <li className='nav-item'>
+            {/* <li className='nav-item'>
               <Link
                 to='/administracion'
                 className='nav-links'
@@ -76,7 +76,7 @@ function Navbar() {
               >
                 Administraci&oacute;n
               </Link>
-            </li>
+            </li> */}
             <li className='nav-item'>
               {isLoggedIn ? (
                 <Button buttonStyle='btn--outline' onClick={handleLogout}>SALIR</Button>
