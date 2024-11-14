@@ -53,7 +53,7 @@ export default function SignIn() {
   //envio de datos
   const [model,setModel] = useState(null);
   const [action,setAction] = useState('NONE');
-  let url = `${Config.boApiPrefix}/login`;
+  let url = `${Config.boApiPrefix}/session`;
   console.log(url);
   const {dataResponse, statusCode, loading, error} = UseFetch(url, action, model);
 
