@@ -66,8 +66,38 @@ export function UseFetch(url, action, body = null, bearer = null) {
         setStatusCode(response.status);
       } catch (err) {
         console.log("4) hubo un error:");
+        
         if (err.response) {  // Si el error tiene respuesta con detalle
-          setError(`Error inesperado: ${err.response.statusText}`);
+
+          console.log("error response:",err.response);
+          let message;
+          if (err.response.data !== undefined) {
+            let errors = err.response.data?.errors;
+
+            //handle gestion api errors
+            if(errors !== undefined){
+              errors.forEach(err => {
+                  message = message + `en ${err.object} - Campo: ${err.field}, Valor: ${err['rejected-value']}, Mensaje: ${err.message}`;
+              });
+            }
+            
+            if (!message) {
+              //hanlde reserva api errors
+              errors = err.response;
+              if(errors.data?.detail && errors.data?.msg){
+                message = `en ${errors.data.detail}: ${errors.data.msg}`
+              }else{
+                  message = `en ${JSON.stringify(errors)}`
+              }
+              console.log("message:", message);
+            }
+
+            if(!message) {
+              message = err.response?.data;
+            }
+          }
+          
+          setError(`Error inesperado: ${message}`);
           setStatusCode(err.response.status);  // Guardar código de error
         } else {
           setError(err.message);  // Errores de red u otros
