@@ -24,10 +24,11 @@ export default function ReservaForm() {
   const [action,setAction] = useState('NONE');
   const [url, setUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isloading, setLoading] = useState(true);
   const [descripcionHorario,setDescripcionHorario]= useState('');
   const [isReadOnly, setIsReadOnly] = useState(false);
-
+  const [getUrl, setGetUrl] = useState(''); 
+  const [getAction,setGetAction] = useState(null);
+  const [model, setModel] = useState(null);
   //inicialización de lista para validación de datos de formulario
   const [errors, setErrors] = useState({});
   const [formErrorMessage, setFormErrorMessage] = useState('');
@@ -57,24 +58,19 @@ export default function ReservaForm() {
     { value: '3', label: 'Cancha C' }
   ];
 
+  //llamada para get reserva
+  const { dataResponse:getDataResponse, statusCode:getStatusCode,loading:isGetLoading,error:getError } = UseFetch(
+    getUrl,
+    getAction
+  )
+
   //llamada generica
-  const { dataResponse, statusCode, loading, error } = UseFetch(
+  const { dataResponse, statusCode, loading, error:postError } = UseFetch(
     url,
     action,
-    (action === 'POST' || action === 'PUT') ? formData : null
+    (action === 'POST' || action === 'PUT') ? model : null
   );
 
-  // // Funcion para traer detalles de horario basado en horario_id
-  // const fetchHorarioReserva = async (id) => {
-  //   if(id){
-  //     console.log("1) armando peticion para enviar al server...")
-  //     let urlh = `${Config.beApiPrefix}/horariosreservas`;
-  //     let filter = `horario_id=${idHorario}`;
-  //     console.log(`${urlh}?${filter}`);
-  //     setUrl(`${urlh}?${filter}`);
-  //     setAction('GET');
-  //   }
-  // }
   const fetchHorarioReserva = useCallback((id) => {
     if(id){
       console.log("1) armando peticion para enviar al server...")
@@ -90,8 +86,8 @@ export default function ReservaForm() {
       //let filter = `horario_id=${idHorario}`;
       //console.log(`${urlh}?${filter}`);
       //setUrl(`${urlh}?${filter}`);
-      setUrl(urlh);
-      setAction('GET');
+      setGetUrl(urlh);
+      setGetAction('GET');
     }
   },[idHorario,reservaId]);
 
@@ -102,17 +98,17 @@ export default function ReservaForm() {
   }, [idHorario,reservaId,fetchHorarioReserva]);
 
   useEffect(() => {
-    if (dataResponse && isloading) {
+    if (getDataResponse) {
       // Extraemos y formateamos el objeto para ajustarse a formData
       const formattedData = {
-        reserva_id: dataResponse[0].reserva?.reserva_id || reservaId || '', 
-        cancha_id: dataResponse[0].reserva?.cancha?.cancha_id || '', 
-        usuario_id: dataResponse[0].reserva?.usuario?.usuario_id || idUsuario || '',
-        horario_id: dataResponse[0].horario_id || idHorario || '', 
-        fecha: dataResponse[0].fecha || '',
-        hora: dataResponse[0].hora || '',
-        descripcion: dataResponse[0].reserva?.descripcion || '', 
-        num_personas:  dataResponse[0].reserva?.num_personas || ''
+        reserva_id: getDataResponse[0].reserva?.reserva_id || reservaId || '', 
+        cancha_id: getDataResponse[0].reserva?.cancha?.cancha_id || '', 
+        usuario_id: getDataResponse[0].reserva?.usuario?.usuario_id || idUsuario || '',
+        horario_id: getDataResponse[0].horario_id || idHorario || '', 
+        fecha: getDataResponse[0].fecha || '',
+        hora: getDataResponse[0].hora || '',
+        descripcion: getDataResponse[0].reserva?.descripcion || '', 
+        num_personas:  getDataResponse[0].reserva?.num_personas || ''
       };
       setNumPersonas(formattedData.num_personas);
       setDescripcionHorario(`${formattedData.fecha} ${formattedData.hora}`);
@@ -130,13 +126,11 @@ export default function ReservaForm() {
         console.log("ahora si puede editar");
         setIsReadOnly(false);
       }
-      setLoading(false);
     }
-    if (error) {
-      handleError(error,statusCode);
-      setLoading(false);
+    if (getError) {
+      //toast.error(`${eventError}: ${handleError(getError, getStatusCode)}`, {autoClose: 3000,});
     }
-  }, [dataResponse, statusCode, isloading, error,idHorario,reservaId,idUsuario]);
+  }, [getDataResponse, getStatusCode, isGetLoading, getError,idHorario,reservaId,idUsuario]);
 
   // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
@@ -150,7 +144,6 @@ export default function ReservaForm() {
   // UseFetch hook para hacer llamadas a APIs
   //reserva crear
   const upsertReserva = async (action, formData) => {
-    setAction('NONE');
     const data = new FormData();
     data.append('reserva_id',formData.reserva_id);
     data.append('cancha_id', formData.cancha_id);
@@ -158,11 +151,12 @@ export default function ReservaForm() {
     data.append('horario_id', formData.horario_id);
     data.append('descripcion', formData.descripcion);
     data.append('num_personas', formData.num_personas);
-    setFormData(data);
-    let target = action === 'POST' ? "reservas" : `reservas\\${formData.reserva_id}`
+    setModel(data);
+    let target = action === 'POST' ? "reservas" : `reservas/${formData.reserva_id}`
     console.log("destino: ",target);
     setUrl(`${Config.beApiPrefix}/${target}`);
     setAction(action);
+    setIsSubmitting(true);
   }
 
   // Función para validar el formulario
@@ -210,7 +204,11 @@ export default function ReservaForm() {
     e.preventDefault();
 
     if (validateForm()) {
-      setIsSubmitting(true);
+      const { descripcion } = formData;
+      if (descripcion.trim().length === 0) {
+        toast.error('La descripci\u00F3n no puede estar vac\u00EDa');
+        return;
+      }
       let action = reservaId === undefined ? 'POST' : 'PUT'
       upsertReserva(action,formData);
     } else {
@@ -220,23 +218,28 @@ export default function ReservaForm() {
   
   // Monitor API response after submission
   useEffect(() => {
-    if (loading) {
+    console.log("error post?:", postError);
+    console.log("statusCode post?:", statusCode);
+    console.log("loading?", loading);
+    if (loading || isGetLoading) {
       toast.info('Loading...', {autoClose: 500,});
     }
-    else if(!loading && isSubmitting)
+    else
     {
-      if (error) {
-        toast.error(`${eventError}: ${handleError(error, statusCode)}`, {autoClose: 2000,});
+      if (postError && (statusCode !== 200 || statusCode !== 201)) {
+        toast.error(`${eventError}: ${handleError(postError, statusCode)}`, {autoClose: 5000,});
+        setIsReadOnly(false);
+        setErrors({});
       }
       else{
-        if (dataResponse && !(error) && (statusCode === 200 || statusCode === 201)) {
+        if (dataResponse && !(postError) && (statusCode === 200 || statusCode === 201)) {
           toast.success(`${eventOk}`, {autoClose: 1500,});
           setTimeout(() => navigate('/horarios', { replace: true }), 1500);
         }
       }
       setIsSubmitting(false);
     }
-  }, [loading, statusCode, error, isSubmitting, dataResponse,navigate]);
+  }, [loading, statusCode, postError, isSubmitting, dataResponse,navigate]);
 
   
 

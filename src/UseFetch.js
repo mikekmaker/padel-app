@@ -64,6 +64,8 @@ export function UseFetch(url, action, body = null, bearer = null) {
         console.log("4) obtengo datos...");
         setDataResponse(response.data);
         setStatusCode(response.status);
+        console.log("nuevo status:", response.status);
+        setError(null);
       } catch (err) {
         console.log("4) hubo un error:");
         
