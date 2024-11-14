@@ -77,7 +77,7 @@ export function UseFetch(url, action, body = null, bearer = null) {
             //handle gestion api errors
             if(errors !== undefined){
               errors.forEach(err => {
-                  message = message + `en ${err.object} - Campo: ${err.field}, Valor: ${err['rejected-value']}, Mensaje: ${err.message}`;
+                  message = message + ` en ${err.object} - Campo: ${err.field}, Valor: ${err['rejected-value']}, Mensaje: ${err.message}`;
               });
             }
             
@@ -85,9 +85,9 @@ export function UseFetch(url, action, body = null, bearer = null) {
               //hanlde reserva api errors
               errors = err.response;
               if(errors.data?.detail && errors.data?.msg){
-                message = `en ${errors.data.detail}: ${errors.data.msg}`
+                message = ` en ${errors.data.detail}: ${errors.data.msg}`
               }else{
-                  message = `en ${JSON.stringify(errors)}`
+                  message = ` en ${JSON.stringify(errors)}`
               }
               console.log("message:", message);
             }
