@@ -313,7 +313,7 @@ export default function ReservaForm() {
                   Guardar
                 </button>
         )}
-        {!isReadOnly && formData.reserva_id != '' && (
+        {!isReadOnly && formData.reserva_id !== '' && (
            <button onClick={handleDelete} className="btns btn btn--outline btn--large" style={{ zIndex: 2, position: 'relative' }}>Eliminar</button>
         )}
         
