@@ -88,7 +88,7 @@ export default function SignUp() {
         }
     });
 
-    const { contrasena, recontrasena, email, remail } = formData;
+    const { contrasena, recontrasena, email, remail, telefono } = formData;
 
     // Check if passwords match
     if (contrasena !== recontrasena) {
@@ -101,6 +101,13 @@ export default function SignUp() {
       toast.error('Los correos electr\u00F3nicos no coinciden');
       return;
     }
+
+    // Check if telefono has 10 digits 
+    if (telefono.length > 10 || telefono.length < 10) {
+      toast.error('El tel\u00E9fono debe tener 10 d\u00EDgitos');
+      return;
+    }
+
 
     if (Object.keys(newErrors).length > 0) {
         setFormErrorMessage(incompleteFieldsError);
