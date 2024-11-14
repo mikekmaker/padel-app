@@ -160,8 +160,7 @@ export default function ReservaForm() {
     data.append('num_personas', formData.num_personas);
     setFormData(data);
     let target = action === 'POST' ? "reservas" : `reservas\\${formData.reserva_id}`
-    console.log("destino");
-    console.log(target);
+    console.log("destino: ",target);
     setUrl(`${Config.beApiPrefix}/${target}`);
     setAction(action);
   }
@@ -202,6 +201,11 @@ export default function ReservaForm() {
     });
   };
 
+  const handleGoBack = (e) => {
+    e.preventDefault();
+    navigate('/horarios', { replace: true });
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -225,7 +229,7 @@ export default function ReservaForm() {
         toast.error(`${eventError}: ${handleError(error, statusCode)}`, {autoClose: 2000,});
       }
       else{
-        if (dataResponse) {
+        if (dataResponse && !(error) && (statusCode === 200 || statusCode === 201)) {
           toast.success(`${eventOk}`, {autoClose: 1500,});
           setTimeout(() => navigate('/horarios', { replace: true }), 1500);
         }
@@ -305,11 +309,20 @@ export default function ReservaForm() {
         </div>
         <div></div>
         <div></div>
-        <button type="submit" className="btn btn--outline btn--large" disabled={isReadOnly}>
-          Guardar
-        </button>
-        <button onClick={handleDelete} className="btns btn btn--outline btn--large" disabled={isReadOnly} style={{ zIndex: 2, position: 'relative' }}>Eliminar</button>
-        <div></div>
+        {!isReadOnly && (
+                <button type="submit" className="btn btn--outline btn--large">
+                  Guardar
+                </button>
+        )}
+        {!isReadOnly && (
+           <button onClick={handleDelete} className="btns btn btn--outline btn--large" style={{ zIndex: 2, position: 'relative' }}>Eliminar</button>
+        )}
+        {isReadOnly && (
+           <button onClick={handleGoBack} className="btns btn btn--outline btn--large" style={{ zIndex: 2, position: 'relative' }}>Volver</button>
+        )
+
+        }
+       <div></div>
         {formErrorMessage && <div className="floating-error">{formErrorMessage}</div>}
       </form>
     </div>
