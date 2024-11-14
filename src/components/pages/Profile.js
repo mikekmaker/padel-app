@@ -44,7 +44,7 @@ export default function Profile() {
 
   //datos de sesión
   const [nombreCompleto, setNombreCompleto] = useState('');
-
+  const [oldAlias, setOldAlias] = useState('');
   //manejo de imagenes
   const [photoBase64, setPhotoBase64] = useState('');
   const [imageSrc, setImageSrc] = useState('');
@@ -122,6 +122,7 @@ export default function Profile() {
       console.log(dataResponse.usuario);
       setFormData(dataResponse.usuario);
       setEdad(dataResponse.usuario.edad);
+      setOldAlias(dataResponse.usuario.alias);
       setNombreCompleto(`${dataResponse.usuario.nombre} ${dataResponse.usuario.apellido}`);
       setLoading(false);
     }
@@ -176,7 +177,7 @@ export default function Profile() {
         }
     });
 
-    const { contrasena, recontrasena, email, remail, id, telefono } = formData;
+    const { contrasena, recontrasena, email, remail, id, telefono, alias } = formData;
 
     // Check if passwords match
     if (contrasena !== recontrasena) {
@@ -194,6 +195,10 @@ export default function Profile() {
     if (telefono.length > 10 || telefono.length < 10) {
       toast.error('El tel\u00E9fono debe tener 10 d\u00EDgitos');
       return;
+    }
+
+    if (alias !== oldAlias){
+      toast.info('Al cambiar el Alias debe volver a loguearse');
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -279,10 +284,16 @@ export default function Profile() {
       else{
         if (dataResponse && !(error) && (statusCode === 200 || statusCode === 201)) {
           toast.success(`${eventOk}`, {autoClose: 1500,});
+          if(oldAlias !== formData.alias){
+            logout();
+            setTimeout(() => {
+              navigate('/voy', { replace: true });
+              }, 2000);
+          }
         }
       }
     }
-    }, [dataResponse, statusCode, loading, error]);
+    }, [dataResponse, statusCode, loading, error, oldAlias]);
   
     //restricciones en layout
     const limitInput = (e) => {
